@@ -38,6 +38,8 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O4 -Werror")
 
 FIND_PACKAGE(LIBQES 0.0.1 REQUIRED)
 FIND_PACKAGE(ZLIB 1.2.5 REQUIRED)
+SET(SEQHAX_DEPENDS_CFLAGS
+	${SEQHAX_DEPENDS_CFLAGS} ${ZLIB_CFLAGS} ${LIBQES_CFLAGS})
 SET(SEQHAX_LIB_DEPENDS
     ${SEQHAX_LIB_DEPENDS} ${ZLIB_LIBRARIES} ${LIBQES_LIBRARIES})
 SET(SEQHAX_DEPENDS_INCLUDE_DIRS
@@ -66,12 +68,12 @@ SET(SEQHAXWRN "${SEQHAXWRN} -Wmissing-declarations -Wredundant-decls -Wnested-ex
 SET(SEQHAXWRN "${SEQHAXWRN} -Wbad-function-cast -Wswitch-enum -Winit-self")
 SET(SEQHAXWRN "${SEQHAXWRN} -Wmissing-field-initializers -Wdeclaration-after-statement")
 SET(SEQHAXWRN "${SEQHAXWRN} -Wold-style-definition -Waddress -Wmissing-noreturn ")
-SET(SEQHAXWRN "${SEQHAXWRN} -Wstrict-overflow=1 -Wextra -Warray-bounds")
+SET(SEQHAXWRN "${SEQHAXWRN} -Wstrict-overflow=1 -Wextra -Warray-bounds -Wall")
 
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wall ${LIBQES_DEPENDS_CFLAGS}")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLIBQES_VERSION=\\\"${LIBQES_VERSION}\\\" -DLIBQES_NO_OPENMP ${SEQHAXWRN}")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 ${SEQHAX_DEPENDS_CFLAGS}")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SEQHAXWRN}")
 SET(CMAKE_C_FLAGS_DEBUG "-ggdb -O0")
-SET(CMAKE_C_FLAGS_RELEASE "-O3")
+SET(CMAKE_C_FLAGS_RELEASE "-O3 -march=native")
 include_directories(${CMAKE_SOURCE_DIR}/src)
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
