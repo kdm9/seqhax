@@ -40,8 +40,8 @@ GPL v3 (see ./LICENSE).
 
 Copyright (c) 2014 Kevin Murray.
 
-
-`src/ssw.[ch]` is Copyright (c) 2012-1015 Boston College, and are part of
-[ssw](https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library).
-
-
+- `src/ssw.[ch]` is Copyright (c) 2012-1015 Boston College, and are part of
+  [ssw](https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library).
+- `src/ksw.[ch]`, `src/kseq.h` and `src/trimadap.c` are Copyright (c) Heng Li
+  2008-2014, with modifications by Kevin Murray, and were part of
+  [seqtk](https://github.com/lh3/seqtk).
