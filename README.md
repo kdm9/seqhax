@@ -30,7 +30,13 @@ Usage:
 
     fastq_check <fastq_file>
 
-The output is relatively self explanatory :)
+It is a tab-seperated table with files as rows. I use it like this:
+
+    fastq_check reads/*.fastq.gz | tee -a read_summary.tab | column -t
+
+This saves a tsv file for further use/plotting in R or whatever, and prints a
+nicely formatted table to the terminal. There's also a progress line printed to
+stderr, so you know how far through the files it is.
 
 
 License

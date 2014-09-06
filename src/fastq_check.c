@@ -33,41 +33,52 @@ static const char *error_strings[] = {
 int
 main(int argc, char *argv[])
 {
-    struct qes_seq *seq = qes_seq_create();
-    struct qes_seqfile *sf = NULL;
-    ssize_t res = 0;
-    size_t n_recs = 0;
-    size_t seq_len = 0;
-    int ok = 1;
+    int all_ok = 1;
+    int iii = 0;
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: fastq_check <fastqfile>\n");
+        fprintf(stderr, "Usage: fastq_check <fastqfile> [<fastqfile> [...]]\n");
         exit(127);
     }
-    sf = qes_seqfile_create(argv[1], "r");
-    while (res != EOF) {
-        res = qes_seqfile_read(sf, seq);
-        if (res < -2) {
-            printf("[main] Error '%s' at read %zu\n", error_strings[-res],
-                   ++n_recs);
-            ok = 0;
-            continue;
-        } else if (res < 1) {
-            break;
+    fprintf(stdout, "File\tSequences\tBasepairs\tOk?\n");
+    for (iii = 1; iii < argc; iii++ ) {
+        struct qes_seq *seq = qes_seq_create();
+        struct qes_seqfile *sf = NULL;
+        ssize_t res = 0;
+        size_t n_recs = 0;
+        size_t seq_len = 0;
+        int ok = 1;
+        int chars_to_wipe = 0;
+        int jjj = 0;
+
+        sf = qes_seqfile_create(argv[iii], "r");
+        while (res != EOF) {
+            res = qes_seqfile_read(sf, seq);
+            if (res < -2) {
+                fprintf(stderr, "Error '%s' at read %zu in %s\n",
+                        error_strings[-res], ++n_recs, argv[iii]);
+                ok = 0;
+                all_ok = 0;
+                continue;
+            } else if (res < 1) {
+                break;
+            }
+            seq_len += res;
+            if (++n_recs % 100000==0) {
+                chars_to_wipe = fprintf(stderr, "Processed %.1fM seqs of %s\r",
+                                        (float)n_recs/1000000.0, argv[iii]);
+                fflush(stderr);
+            }
         }
-        seq_len += res;
-        if (++n_recs % 1000==0) {
-            printf("[main] Processed %.3fM seqs\r", (float)n_recs/1000000.0);
+        for (jjj = 0; jjj < chars_to_wipe; jjj++) {
+            fprintf(stderr, " ");
         }
+        fprintf(stderr, "\r");
+        fflush(stderr);
+        fprintf(stdout, "%s\t%zu\t%zu\t%s\n", argv[iii], n_recs, seq_len,
+                ok ? "Yes" : "No");
+        qes_seqfile_destroy(sf);
+        qes_seq_destroy(seq);
     }
-    printf("[main] Processed %zu sequences\n", n_recs);
-    printf("[main] Total sequence length is %zu base pairs\n", seq_len);
-    if (ok) {
-        printf("[main] No errors detected in %s\n", argv[1]);
-    } else {
-        printf("[main] Errors were detected in %s\n", argv[1]);
-    }
-    qes_seqfile_destroy(sf);
-    qes_seq_destroy(seq);
-    exit(ok ? 0 : 1);
+    exit(all_ok ? 0 : 1);
 }
