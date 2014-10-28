@@ -8,7 +8,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 enable_testing()
 
 # git versioning
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libqes/cmake-modules")
 
 INCLUDE(GitSemVer)
