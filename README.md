@@ -20,6 +20,8 @@ Install zlib version >=1.2.5, then:
 If cmake complains about missing libqes, please run `git submodule update
 --init` to fetch libqes.
 
+Any other issues, file a bug report on github, as it probably is one.
+
 Documentation
 =============
 
@@ -40,6 +42,13 @@ It is a tab-seperated table with files as rows. I use it like this:
 This saves a tsv file for further use/plotting in R or whatever, and prints a
 nicely formatted table to the terminal. There's also a progress line printed to
 stderr, so you know how far through the files it is.
+
+Note that the syntax is checks is fairly basic: there must be four lines, with
+header, sequence, a line that matches '\+.*\n', and the quality scores. That's
+it. Technically valid fastqs that have multiline seq/quality or that have
+multibyte quality scores etc are counted as invalid, as libqes doesn't handle
+these for speed. Likewise, libqes doesn't do proper checking of valid quality
+scores, basically any ASCII is counted as valid.
 
 License
 =======
