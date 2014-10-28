@@ -8,14 +8,17 @@ or maybe not.
 Installation
 ============
 
-Install zlib and [libqes](https://github.com/kdmurray91/libqes).
+Install zlib version >=1.2.5, then:
 
-    git clone https://github.com/kdmurray91/seqhax.git
+    git clone --recursive https://github.com/kdmurray91/seqhax.git
     cd seqhax
     mkdir build && cd build
     cmake ..
     make
     make install
+
+If cmake complains about missing libqes, please run `git submodule update
+--init` to fetch libqes.
 
 Documentation
 =============
@@ -37,7 +40,6 @@ It is a tab-seperated table with files as rows. I use it like this:
 This saves a tsv file for further use/plotting in R or whatever, and prints a
 nicely formatted table to the terminal. There's also a progress line printed to
 stderr, so you know how far through the files it is.
-
 
 License
 =======
