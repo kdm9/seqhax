@@ -55,7 +55,7 @@ struct _kswq_t {
  *
  * @return       Query data structure
  */
-kswq_t *ksw_qinit(int size, int qlen, const uint8_t *query, int m, const int8_t *mat)
+static kswq_t *ksw_qinit(int size, int qlen, const uint8_t *query, int m, const int8_t *mat)
 {
 	kswq_t *q;
 	int slen, a, tmp, p;
@@ -103,7 +103,7 @@ kswq_t *ksw_qinit(int size, int qlen, const uint8_t *query, int m, const int8_t 
 	return q;
 }
 
-kswr_t ksw_u8(kswq_t *q, int tlen, const uint8_t *target, int _gapo, int _gape, int xtra) // the first gap costs -(_o+_e)
+static kswr_t ksw_u8(kswq_t *q, int tlen, const uint8_t *target, int _gapo, int _gape, int xtra) // the first gap costs -(_o+_e)
 {
 	int slen, i, m_b, n_b, te = -1, gmax = 0, minsc, endsc;
 	uint64_t *b;
@@ -220,7 +220,7 @@ end_loop16:
 	return r;
 }
 
-kswr_t ksw_i16(kswq_t *q, int tlen, const uint8_t *target, int _gapo, int _gape, int xtra) // the first gap costs -(_o+_e)
+static kswr_t ksw_i16(kswq_t *q, int tlen, const uint8_t *target, int _gapo, int _gape, int xtra) // the first gap costs -(_o+_e)
 {
 	int slen, i, m_b, n_b, te = -1, gmax = 0, minsc, endsc;
 	uint64_t *b;

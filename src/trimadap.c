@@ -28,7 +28,8 @@ unsigned char seq_nt4_table[256] = {
 };
 
 typedef struct {
-	int type, len;
+	int type;
+    size_t len;
 	uint8_t *seq;
 	kswq_t *qp;
 	uint64_t cnt;
@@ -36,9 +37,10 @@ typedef struct {
 
 int main(int argc, char *argv[])
 {
-	int n_adaps, m_adaps;
+	size_t n_adaps, m_adaps;
 	int rm_adapt_seq = 0;
-	int c, i, j, k, from_stdin;
+	int c, from_stdin;
+    size_t i, j, k;
 	int sa = 1, sb = 2, go = 1, ge = 3, type = 1;
 	int min_sc = 15, min_len = 10;
 	double max_diff = 0.15;
@@ -129,22 +131,22 @@ int main(int argc, char *argv[])
 			//printf("%d:%.3f [%d,%d):%d <=> [%d,%d):%d\n", r.score, diff, r.qb, r.qe, p->len, r.tb, r.te, (int)str.l);
 			if (r.qb <= r.tb && p->len - r.qe <= str.l - r.te) { // contained
 				if (r.qb * sa > sa + sb) continue;
-				if ((p->len - r.qe) * sa > sa + sb) continue;
+				if (((int)p->len - r.qe) * sa > sa + sb) continue;
 				type = 1;
 			} else if (r.qb <= r.tb) { // 3' overlap
 				if (r.qb * sa > sa + sb) continue;
-				if ((str.l - r.te) * sa > sa + sb) continue;
+				if (((int)str.l - r.te) * sa > sa + sb) continue;
 				type = 2;
 			} else {
-				if ((p->len - r.qe) * sa > sa + sb) continue;
+				if (((int)p->len - r.qe) * sa > sa + sb) continue;
 				if (r.tb * sa > sa + sb) continue;
 				type = 3;
 			}
 			if (p->type == 5) {
-				if (r.tb == 0 && r.qe == p->len && (r.te - r.tb) * sa == r.score)
+				if (r.tb == 0 && r.qe == (int)p->len && (r.te - r.tb) * sa == r.score)
 					type = 4;
 			} else if (p->type == 3) {
-				if (r.qb == 0 && r.te == str.l && (r.te - r.tb) * sa == r.score)
+				if (r.qb == 0 && r.te == (int)str.l && (r.te - r.tb) * sa == r.score)
 					type = 4;
 			}
 			if (type == 4) {
