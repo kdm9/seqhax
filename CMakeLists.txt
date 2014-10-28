@@ -8,23 +8,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 enable_testing()
 
 # git versioning
-list(INSERT CMAKE_MODULE_PATH 0 "/home/kevin/prog/bio/libqes")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
-INCLUDE(GetGitRevisionDescription)
-get_git_head_revision(rev hash)
-git_get_exact_tag(tag)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libqes/cmake-modules")
 
-IF ("${tag}")
-	set(VERSION "${tag}-")
-ELSEIF (NOT "${rev}" STREQUAL "")
-	GET_FILENAME_COMPONENT(shortref "${rev}" NAME)
-	set(VERSION "git@${shortref}/")
-ENDIF()
-IF (NOT "${hash}" STREQUAL "")
-	STRING(SUBSTRING ${hash} 0 7 hash)
-	set(VERSION "${VERSION}${hash}")
-ENDIF()
-
+INCLUDE(GitSemVer)
+GetGitSemVer(VERSION)
 MESSAGE(STATUS "Building seqhax version:  ${VERSION}")
 
 # CC options
@@ -36,14 +24,13 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O4 -Werror")
 ## Find Packages and Headers ##
 ###############################
 
-FIND_PACKAGE(LIBQES 0.0.1 REQUIRED)
 FIND_PACKAGE(ZLIB 1.2.5 REQUIRED)
 SET(SEQHAX_DEPENDS_CFLAGS
-	${SEQHAX_DEPENDS_CFLAGS} ${ZLIB_CFLAGS} ${LIBQES_CFLAGS})
+	${SEQHAX_DEPENDS_CFLAGS} ${ZLIB_CFLAGS})
 SET(SEQHAX_LIB_DEPENDS
-    ${SEQHAX_LIB_DEPENDS} ${ZLIB_LIBRARIES} ${LIBQES_LIBRARIES})
+    ${SEQHAX_LIB_DEPENDS} qes ${ZLIB_LIBRARIES})
 SET(SEQHAX_DEPENDS_INCLUDE_DIRS
-    ${SEQHAX_DEPENDS_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS} ${LIBQES_INCLUDE_DIRS})
+    ${SEQHAX_DEPENDS_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${SEQHAX_DEPENDS_INCLUDE_DIRS})
 
 ##########################
@@ -74,7 +61,10 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 ${SEQHAX_DEPENDS_CFLAGS}")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SEQHAXWRN}")
 SET(CMAKE_C_FLAGS_DEBUG "-ggdb -O0")
 SET(CMAKE_C_FLAGS_RELEASE "-O3 -march=native")
-include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/src
+	${CMAKE_BINARY_DIR}
+	${CMAKE_SOURCE_DIR}/libqes/src)
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
+add_subdirectory(libqes)
 add_subdirectory(src)
