@@ -1,7 +1,7 @@
 /*
  * ============================================================================ *
- *       Filename:  unique_barcode.c
- *    Description:  
+ *       Filename:  fastq_remove_prefix.c
+ *    Description:  Remove a DNA prefix from each read
  *        License:  GPLv3+
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
