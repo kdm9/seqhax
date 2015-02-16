@@ -1,6 +1,6 @@
 # Targets
 ADD_LIBRARY(libseqhax STATIC seqhax.c ssw.c)
-TARGET_LINK_LIBRARIES(libseqhax qes ${SEQHAX_LIB_DEPENDS})
+TARGET_LINK_LIBRARIES(libseqhax qes_static ${SEQHAX_LIB_DEPENDS})
 SET_TARGET_PROPERTIES(libseqhax PROPERTIES OUTPUT_NAME seqhax)
 
 # fastq_remove_prefix - Remove a unique 16-mer to each different sample from a lane
