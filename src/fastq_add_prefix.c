@@ -1,16 +1,8 @@
 /*
  * ============================================================================ *
  *       Filename:  unique_barcode.c
- *
  *    Description:  
- *
- *        Version:  1.0
- *        Created:  17/09/14 14:49:11
- *       Revision:  none
  *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *   Compile With:  cc -O3 -Wall -Wextra -std=c99 -o  unique_barcode.c
- *
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
  * ============================================================================
