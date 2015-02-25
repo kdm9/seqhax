@@ -79,5 +79,6 @@ include_directories(${CMAKE_SOURCE_DIR}/src
 	${CMAKE_SOURCE_DIR}/libqes/src)
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
+SET(LIBQES_AS_SUBMODULE True)  # stop libqes installing itself
 add_subdirectory(libqes)
 add_subdirectory(src)
