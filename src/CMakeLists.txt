@@ -3,20 +3,25 @@ ADD_LIBRARY(libseqhax STATIC seqhax.c ssw.c)
 TARGET_LINK_LIBRARIES(libseqhax qes_static ${SEQHAX_LIB_DEPENDS})
 SET_TARGET_PROPERTIES(libseqhax PROPERTIES OUTPUT_NAME seqhax)
 
-# fastq_remove_prefix - Remove a unique 16-mer to each different sample from a lane
-ADD_EXECUTABLE(fastq_remove_prefix fastq_remove_prefix.c)
-TARGET_LINK_LIBRARIES(fastq_remove_prefix libseqhax ${SEQHAX_LIB_DEPENDS})
-INSTALL(TARGETS fastq_remove_prefix DESTINATION "bin")
-
 # fastq_add_prefix - Add a unique 16-mer to each different sample from a lane
 ADD_EXECUTABLE(fastq_add_prefix fastq_add_prefix.c)
 TARGET_LINK_LIBRARIES(fastq_add_prefix libseqhax ${SEQHAX_LIB_DEPENDS})
 INSTALL(TARGETS fastq_add_prefix DESTINATION "bin")
 
+# fastq_remove_prefix - Remove a unique 16-mer to each different sample from a lane
+ADD_EXECUTABLE(fastq_remove_prefix fastq_remove_prefix.c)
+TARGET_LINK_LIBRARIES(fastq_remove_prefix libseqhax ${SEQHAX_LIB_DEPENDS})
+INSTALL(TARGETS fastq_remove_prefix DESTINATION "bin")
+
 # fastq_check - check a fastq file
 ADD_EXECUTABLE(fastq_check fastq_check.c)
 TARGET_LINK_LIBRARIES(fastq_check libseqhax ${SEQHAX_LIB_DEPENDS})
 INSTALL(TARGETS fastq_check DESTINATION "bin")
+
+# ilfastq_len_filter - removes short pairs from an interleaved fastq
+ADD_EXECUTABLE(ilfastq_len_filter ilfastq_len_filter.c)
+TARGET_LINK_LIBRARIES(ilfastq_len_filter libseqhax ${SEQHAX_LIB_DEPENDS})
+INSTALL(TARGETS ilfastq_len_filter DESTINATION "bin")
 
 # trimadap.c - Heng Li's trimadap, with some fixes he won't merge
 ADD_EXECUTABLE(trimadap trimadap.c ksw.c)
