@@ -25,7 +25,7 @@ Any other issues, file a bug report on github, as it probably is one.
 Documentation
 =============
 
-fastq_check
+fastq-check
 -----------
 
 Check a fastq file for syntax errors. Also counts the number of records and
@@ -33,11 +33,11 @@ total sequence length in base-pairs.
 
 Usage:
 
-    fastq_check <fastq_file>  [<fastqfile> [...]]
+    fastq-check <fastq-file>  [<fastqfile> [...]]
 
 It is a tab-seperated table with files as rows. I use it like this:
 
-    fastq_check reads/*.fastq.gz | tee read_summary.tab | column -t
+    fastq-check reads/*.fastq.gz | tee read_summary.tab | column -t
 
 This saves a tsv file for further use/plotting in R or whatever, and prints a
 nicely formatted table to the terminal. There's also a progress line printed to

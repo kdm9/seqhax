@@ -24,38 +24,55 @@ main(int argc, char *argv[])
     size_t n_recs = 0;
     ssize_t res1 = 0;
     ssize_t res2 = 0;
+    int quiet = 0;
+    const char *filename = "/dev/stdin";
+    int c = 0;
 
     /* Parse CLI options */
-    switch(getopt(argc, argv, "l:")) {
-    case 'l':
-        min_len = (size_t) atol(optarg);
-        break;
-    case '?':
-        fprintf(stderr, "Bad option %s\n\n", argv[optind]);
-    default:
-        fprintf(stderr, "USAGE: %s -l <min_len> <ilfq_file>\n", argv[0]);
+    while ((c = getopt(argc, argv, "l:q") > 0)) {
+        switch (c) {
+        case 'q':
+            quiet = 1;
+            break;
+        case 'l':
+            min_len = (size_t) atol(optarg);
+            break;
+        case '?':
+            fprintf(stderr, "Bad option %s\n\n", argv[optind]);
+        default:
+            fprintf(stderr, "USAGE: %s [-q] -l <min_len> [<ilfq_file>]\n",
+                    argv[0]);
+            return EXIT_FAILURE;
+        }
+    }
+    if (min_len == 0) {
+        /* We're doing nothing here. Bail out */
+        fprintf(stderr, "USAGE: %s [-q] -l <min_len> [<ilfq_file>]\n",
+                argv[0]);
         return EXIT_FAILURE;
     }
-    if (argc <= optind) {
-        fprintf(stderr, "Error: Must provide input file\n\n");
-        fprintf(stderr, "USAGE: %s -l <min_len> <ilfq_file>\n", argv[0]);
-        return EXIT_FAILURE;
+    if (argc > optind) {
+        filename = argv[optind];
     }
 
     r1 = qes_seq_create();
     r2 = qes_seq_create();
-    sf = qes_seqfile_create(argv[optind], "r");
+    sf = qes_seqfile_create(filename, "r");
     while ((res1 = qes_seqfile_read(sf, r1)) > 0 &&
            (res2 = qes_seqfile_read(sf, r2)) > 0) {
         if (r1->seq.len >= min_len && r2->seq.len >= min_len) {
             qes_seq_print(r1, stdout);
             qes_seq_print(r2, stdout);
         }
-        if (++n_recs % 100000==0) {
+        if (!quiet && ++n_recs % 100000==0) {
             fprintf(stderr, "Processed %.1fM seqs of %s\r",
-                    (float)n_recs/1000000.0, argv[optind]);
+                    (float)n_recs/1000000.0, filename);
             fflush(stderr);
         }
+    }
+    if (!quiet) {
+        fprintf(stderr, "\nFinished processing %s (%.3fM reads)\n", filename,
+                (float)n_recs/1000000.0);
     }
 
     qes_seqfile_destroy(sf);
