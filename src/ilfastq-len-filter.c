@@ -78,5 +78,5 @@ main(int argc, char *argv[])
     qes_seqfile_destroy(sf);
     qes_seq_destroy(r1);
     qes_seq_destroy(r2);
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }
