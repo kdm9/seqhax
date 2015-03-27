@@ -23,6 +23,12 @@ ADD_EXECUTABLE(ilfastq-len-filter ilfastq-len-filter.c)
 TARGET_LINK_LIBRARIES(ilfastq-len-filter libseqhax ${SEQHAX_LIB_DEPENDS})
 INSTALL(TARGETS ilfastq-len-filter DESTINATION "bin")
 
+# infinite-fastq - makes an infinitely long fastq file
+ADD_EXECUTABLE(infinite-fastq infinite-fastq.c)
+TARGET_LINK_LIBRARIES(infinite-fastq libseqhax ${SEQHAX_LIB_DEPENDS})
+INSTALL(TARGETS infinite-fastq DESTINATION "bin")
+
+
 # trimadap.c - Heng Li's trimadap, with some fixes he won't merge
 ADD_EXECUTABLE(trimadap trimadap.c ksw.c)
 TARGET_LINK_LIBRARIES(trimadap ${SEQHAX_LIB_DEPENDS})
