@@ -33,14 +33,14 @@ def main():
             print("WARNING: truncating", seq.name, file=sys.stderr)
             seq_len = qual_len
         out_seq = "@{}\n{}\n+\n{}\n".format(seq.name, seq.sequence[:seq_len],
-                                          qual.accuracy[:seq_len])
+                                            qual.accuracy[:seq_len])
         print(out_seq, end='')
 
 USAGE = """
 USAGE: {} <seq_fastq> <qual_fastq>
 
-Splices the sequence lines from <seq_fastq> with the quality lines of
-<qual_fastq>, truncating both the the shorter of the two.
+Splices the sequence (and header) lines from <seq_fastq> with the quality lines
+of <qual_fastq>, truncating both the the shorter of the two.
 """
 
 if __name__ == "__main__":
