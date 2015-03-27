@@ -1,8 +1,8 @@
 /*
  * ============================================================================
  *
- *       Filename:  ilfastq_len_filter.c
- *    Description:  Check a fastq for weird errors
+ *       Filename:  infinite-fastq.c
+ *    Description:  Make an infinite FASTQ file
  *        License:  GPLv3+
  *         Author:  Kevin Murray, spam@kdmurray.id.au
  *
