@@ -23,7 +23,7 @@ main(int argc, char *argv[])
     ssize_t res = 0;
     size_t n_recs = 0;
 
-    switch(getopt(argc, argv, "b:")) {
+    switch(getopt(argc, argv, "p:")) {
     case 'p':
         prefix = strdup(optarg);
         prefix_len = strlen(prefix);
