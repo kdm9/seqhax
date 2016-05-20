@@ -10,15 +10,12 @@ Installation
 
 Install zlib version >=1.2.5, then:
 
-    git clone --recursive https://github.com/kdmurray91/seqhax.git
+    git clone https://github.com/kdmurray91/seqhax.git
     cd seqhax
     mkdir build && cd build
     cmake ..
     make
     make install
-
-If cmake complains about missing libqes, please run `git submodule update
---init` to fetch libqes.
 
 Any other issues, file a bug report on github, as it probably is one.
 
@@ -59,6 +56,3 @@ Copyright (c) 2014 Kevin Murray.
 
 - `src/ssw.[ch]` is Copyright (c) 2012-1015 Boston College, and are part of
   [ssw](https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library).
-- `src/ksw.[ch]`, `src/kseq.h` and `src/trimadap.c` are Copyright (c) Heng Li
-  2008-2014, with modifications by Kevin Murray, and were part of
-  [seqtk](https://github.com/lh3/seqtk).
