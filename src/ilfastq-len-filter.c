@@ -20,7 +20,7 @@ main(int argc, char *argv[])
     struct qes_seq *r1 = NULL;
     struct qes_seq *r2 = NULL;
     struct qes_seqfile *sf = NULL;
-    size_t min_len = 0;
+    size_t min_len = 20;
     size_t n_recs = 0;
     ssize_t res1 = 0;
     ssize_t res2 = 0;
@@ -29,7 +29,7 @@ main(int argc, char *argv[])
     int c = 0;
 
     /* Parse CLI options */
-    while ((c = getopt(argc, argv, "l:q") > 0)) {
+    while ((c = getopt(argc, argv, "ql:") != -1)) {
         switch (c) {
         case 'q':
             quiet = 1;
@@ -38,8 +38,7 @@ main(int argc, char *argv[])
             min_len = (size_t) atol(optarg);
             break;
         case '?':
-            fprintf(stderr, "Bad option %s\n\n", argv[optind]);
-        default:
+            fprintf(stderr, "Bad option '%x' %x\n\n", optopt, c);
             fprintf(stderr, "USAGE: %s [-q] -l <min_len> [<ilfq_file>]\n",
                     argv[0]);
             return EXIT_FAILURE;
@@ -47,6 +46,7 @@ main(int argc, char *argv[])
     }
     if (min_len == 0) {
         /* We're doing nothing here. Bail out */
+        fprintf(stderr, "Error: minimum length must be >0.\n");
         fprintf(stderr, "USAGE: %s [-q] -l <min_len> [<ilfq_file>]\n",
                 argv[0]);
         return EXIT_FAILURE;
