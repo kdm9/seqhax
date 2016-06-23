@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <getopt.h>
 #include <assert.h>
+#include <time.h>
 
 #include <qes_seq.h>
 
@@ -55,12 +56,11 @@ randfq_main(int argc, char *argv[])
     uint32_t seqlen = 100;
     uint64_t num_seqs = 1000;
     pcg32_random_t rng;
-    uint32_t seed;
+    uint64_t seed = 0;
     bool paired = false;
     bool fasta = false;
     int c;
 
-    pcg32_srandom_r(&rng, 31u, 12u);
     while ((c = getopt(argc, argv, randfq_optstr)) > 0) {
         switch (c) {
             case 'n':
@@ -73,7 +73,6 @@ randfq_main(int argc, char *argv[])
                     randfq_usage(stderr);
                     return EXIT_FAILURE;
                 }
-                pcg32_srandom_r(&rng, seed, seed + 12);
                 break;
             case 'l':
                 seqlen = strtoull(optarg, NULL, 10);
@@ -96,6 +95,12 @@ randfq_main(int argc, char *argv[])
                 break;
         }
     }
+    if (seed == 0) {
+        seed = (uint64_t) time(NULL);
+        // x-or with address in case multiple processes start at once;
+        seed ^= (uint64_t) &seed;
+    }
+    pcg32_srandom_r(&rng, seed, seed + 12);
 
     // Init sequence
     char *sequence = calloc(seqlen + 1, 1);
