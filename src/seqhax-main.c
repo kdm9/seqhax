@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "progs/randfq.c"
+#include "progs/progs.h"
 
 static const char *programs[] = {
     "randfq  -- generates random sequence files",

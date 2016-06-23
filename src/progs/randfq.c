@@ -28,7 +28,7 @@ randfq_usage(FILE *stream)
     fprintf(stream, "    -p         Paired reads [default false]\n");
     fprintf(stream, "    -f         Output as fasta (no qualities)\n");
 }
-static const char *randfq_optstr = "n:s:l:pf";
+static const char *randfq_optstr = "n:s:l:pfh";
 
 static inline void
 randseq(pcg32_random_t *rng, char *seq, size_t len)
@@ -89,8 +89,8 @@ randfq_main(int argc, char *argv[])
             case 'f':
                 fasta = true;
                 break;
+            case 'h':
             default:
-                fprintf(stderr, "Invalid argument '%c' (=%s)\n\n", optopt, optarg);
                 randfq_usage(stderr);
                 return EXIT_FAILURE;
                 break;
@@ -114,7 +114,7 @@ randfq_main(int argc, char *argv[])
         free(qual);
     }
 
-    for (; n_recs < num_seqs; n_recs++) {
+    for (; num_seqs == 0 || n_recs < num_seqs; n_recs++) {
         size_t namelen = 0;
         char readid[101] = "";
         if (paired) {
@@ -130,5 +130,6 @@ randfq_main(int argc, char *argv[])
         qes_seq_print(seq, stdout);
     }
     qes_seq_destroy(seq);
+    free(sequence);
     return EXIT_SUCCESS;
 }

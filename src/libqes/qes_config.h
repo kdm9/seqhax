@@ -35,6 +35,8 @@
 
 #define LIBQES_VERSION "seqhax";
 
+#define ZLIB_FOUND
+
 /* Definitions to make changing fp type easy */
 #   include <zlib.h>
 #   define QES_ZTYPE gzFile
