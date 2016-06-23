@@ -1,14 +1,3 @@
-/*
- * ============================================================================
- *
- *       Filename:  seqhax.h
- *    Description:  seqhax utilities
- *        License:  GPLv3+
- *         Author:  Kevin Murray, spam@kdmurray.id.au
- *
- * ============================================================================
- */
-
 #include <stdlib.h>
 #include <stdio.h>
 

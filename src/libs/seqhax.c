@@ -1,19 +1,3 @@
-/*
- * ============================================================================
- *
- *       Filename:  seqhax.c
- *
- *    Description:  seqhax
- *
- *        Created:  20/12/14 21:24:53
- *        License:  GPLv3+
- *       Compiler:  gcc, clang
- *
- *         Author:  Kevin Murray, spam@kdmurray.id.au
- *
- * ============================================================================
- */
-
 #include "seqhax.h"
 
 int
