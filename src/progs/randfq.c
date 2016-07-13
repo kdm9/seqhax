@@ -1,7 +1,7 @@
 /*******************************************************************************
 *                                   randfq                                    *
 *                                                                             *
-*                        Creates random sequence file                         *
+*                      Creates a random sequence file                         *
 *******************************************************************************/
 
 #include <stdlib.h>
@@ -12,11 +12,10 @@
 #include <assert.h>
 #include <time.h>
 
-#include <qes_seq.h>
-
+#include "qes_seq.h"
 #include "pcg_variants.h"
 
-void
+static void
 randfq_usage(FILE *stream)
 {
     fprintf(stream, "USAGE:\n");
