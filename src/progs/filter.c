@@ -85,7 +85,6 @@ filter_main(int argc, char *argv[])
             return EXIT_FAILURE;
             break;
         }
-        printf("c %d i %d arg %s\n", c, optind, argv[optind]);
     }
     if (fasta) {
         fprintf(stderr, "fasta\n");
