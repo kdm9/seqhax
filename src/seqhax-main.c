@@ -7,6 +7,7 @@
 static const char *programs[] = {
     "randfq  -- Generates random sequence files",
     "filter  -- Filter reads from a sequence file",
+    "seq     -- Misc sequence modification",
     NULL
 };
 
@@ -18,6 +19,7 @@ struct seqhax_prog {
 static const struct seqhax_prog program_mains[] = {
     {"randfq", randfq_main},
     {"filter", filter_main},
+    {"seq", seq_main},
     {NULL, NULL}
 };
 
