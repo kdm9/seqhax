@@ -1,8 +1,7 @@
 /*******************************************************************************
-*                                   randfq                                    *
-*                                                                             *
-*                      Creates a random sequence file                         *
+*                  randfq -- Creates a random sequence file                   *
 *******************************************************************************/
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -131,7 +130,7 @@ randfq_main(int argc, char *argv[])
         randseq(&rng, sequence, seqlen);
         qes_seq_fill_seq(seq, sequence, seqlen);
         
-        qes_seq_print(seq, stdout);
+        qes_seq_print(seq, stdout, fasta);
     }
     qes_seq_destroy(seq);
     free(sequence);
