@@ -187,15 +187,16 @@ qes_seq_destroy_(struct qes_seq *seq)
 }
 
 int
-qes_seq_print(const struct qes_seq *seq, FILE *stream)
+qes_seq_print(const struct qes_seq *seq, FILE *stream, bool fasta)
 {
     if (!qes_seq_ok(seq)) return 1;
     if (stream == NULL) return 1;
 
-    if (seq->qual.len > 0) {
-        fputc('@', stream);
-    } else {
+    if (seq->qual.len <= 0) fasta = true;
+    if (fasta) {
         fputc('>', stream);
+    } else {
+        fputc('@', stream);
     }
     fputs(seq->name.str, stream);
     if (seq->comment.str) {
@@ -205,7 +206,7 @@ qes_seq_print(const struct qes_seq *seq, FILE *stream)
     fputc('\n', stream);
     fputs(seq->seq.str, stream);
     fputc('\n', stream);
-    if (seq->qual.len > 0) {
+    if (!fasta) {
         fputs("+\n", stream);
         fputs(seq->qual.str, stream);
         fputc('\n', stream);

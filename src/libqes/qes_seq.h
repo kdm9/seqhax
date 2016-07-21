@@ -29,6 +29,7 @@
 #ifndef QES_SEQ_H
 #define QES_SEQ_H
 
+#include <stdbool.h>
 #include <qes_util.h>
 #include <qes_str.h>
 
@@ -173,7 +174,8 @@ Description:    Print ``seq`` in formatted per ``format`` to ``stream``.
 Returns:        int: 1 on success, 0 on failure.
  *===========================================================================*/
 int qes_seq_print              (const struct qes_seq   *seq,
-                                FILE                   *stream);
+                                FILE                   *stream,
+                                bool                    fasta);
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_destroy
