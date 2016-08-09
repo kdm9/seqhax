@@ -3,9 +3,9 @@
 #include <string.h>
 
 static const char *programs[] = {
-    "randfq  -- Generates random sequence files",
+    "randfq  -- Generate a random sequence file",
     "filter  -- Filter reads from a sequence file",
-    "seq     -- Misc sequence modification",
+    "seq     -- Miscellaneous sequence modification",
     NULL
 };
 
