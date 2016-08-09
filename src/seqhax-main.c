@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "progs/progs.h"
-
 static const char *programs[] = {
     "randfq  -- Generates random sequence files",
     "filter  -- Filter reads from a sequence file",
@@ -15,6 +13,11 @@ struct seqhax_prog {
     const char *name;
     int (*mainfunc)(int, char **);
 };
+
+int randfq_main(int argc, char *argv[]);
+int filter_main(int argc, char *argv[]);
+int seq_main(int argc, char *argv[]);
+int stat_main(int argc, char *argv[]);
 
 static const struct seqhax_prog program_mains[] = {
     {"randfq", randfq_main},
