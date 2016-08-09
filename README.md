@@ -1,58 +1,73 @@
 Seqhax
 ======
 
-A collection of (mostly C) programs that are vaguely useful for sequence
-analysis. None deserve their own git repo (yet). They may be useful to others,
-or maybe not.
+A seqtk-style toolkit for sequence analysis. By no means feature complete. In
+fact largely contains features other authors have not merged into their
+respective tools.
 
 Installation
 ============
 
 Install zlib version >=1.2.5, then:
 
-    git clone https://github.com/kdmurray91/seqhax.git
-    cd seqhax
-    mkdir build && cd build
-    cmake ..
-    make
-    make install
+```bash
+git clone https://github.com/kdmurray91/seqhax.git
+cd seqhax
+mkdir build && cd build
+cmake ..
+make
+make install
+```
 
-Any other issues, file a bug report on github, as it probably is one.
+Any other issues, file a [bug report on
+github](https://github.com/kdmurray91/seqhax/issues).
 
 Documentation
 =============
 
-fastq-check
------------
+The `seqhax` command has many subcommands. The commands, along with a synopsis
+of their actions, are displayed when one types `seqhax` with no arguments. 
+At the time of writing, these were:
 
-Check a fastq file for syntax errors. Also counts the number of records and
-total sequence length in base-pairs.
+```
+$ seqhax
+USAGE:
+    seqhax PROGRAM [options]
 
-Usage:
+where PROGRAM is one of:
+    randfq  -- Generate a random sequence file
+    filter  -- Filter reads from a sequence file
+    seq     -- Miscellaneous sequence modification
+```
 
-    fastq-check <fastq-file>  [<fastqfile> [...]]
+The usage of each subcommand can be obtained using the `-h` flag to that
+parameter, e.g. `seqhax seq -h`.
 
-It is a tab-seperated table with files as rows. I use it like this:
 
-    fastq-check reads/*.fastq.gz | tee read_summary.tab | column -t
+## Sub-commands
 
-This saves a tsv file for further use/plotting in R or whatever, and prints a
-nicely formatted table to the terminal. There's also a progress line printed to
-stderr, so you know how far through the files it is.
+#### `randfq`
 
-Note that the syntax is checks is fairly basic: there must be four lines, with
-header, sequence, a line that matches '\+.*\n', and the quality scores. That's
-it. Technically valid fastqs that have multiline seq/quality or that have
-multibyte quality scores etc are counted as invalid, as libqes doesn't handle
-these for speed. Likewise, libqes doesn't do proper checking of valid quality
-scores, basically any ASCII is counted as valid.
+Generates a fasta or fastq file containing sequences with random sequences.
+
+#### `filter`
+
+Removes sequences based on certain criteria:
+
+- Length
+* Pairing
+
+
+#### `seq`
+
+Implements the following functions
+
+- Addition of a constant prefix and/or suffix to each sequence.
+
 
 License
 =======
 
 GPL v3 (see ./LICENSE).
 
-Copyright (c) 2014 Kevin Murray.
-
-- `src/ssw.[ch]` is Copyright (c) 2012-1015 Boston College, and are part of
-  [ssw](https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library).
+Copyright (c) 2014-2016 Kevin Murray.
