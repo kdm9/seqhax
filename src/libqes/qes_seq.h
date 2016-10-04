@@ -134,6 +134,19 @@ qes_seq_n_bytes (const struct qes_seq *seq)
            qes_seq_has_qual(seq) ? 2 + seq->qual.len + 1 : 0;
 }
 
+static inline int
+qes_seq_truncate (struct qes_seq *seq, const size_t at)
+{
+    if (!qes_seq_ok(seq)) return -1;
+
+    int res = 0;
+    res = qes_str_truncate(&seq->seq, at);
+    if (res != 0) return res;
+
+    res = qes_str_truncate(&seq->qual, at);
+    return res;
+}
+
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_fill_header
 Parameters:     struct qes_seq *seqobj: Seq object that will receive the header.

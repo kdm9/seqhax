@@ -131,6 +131,16 @@ qes_str_copy (struct qes_str *dest, const struct qes_str *src)
     return 0;
 }
 
+static inline int
+qes_str_truncate (struct qes_str *str, const size_t at)
+{
+    if (!qes_str_ok(str)) return 1;
+    if (at >= str->len) return 0;
+    str->str[at] = '\0';
+    str->len = at;
+    return 0;
+}
+
 extern void qes_str_print (const struct qes_str *str, FILE *stream);
 
 /*===  FUNCTION  ============================================================*
