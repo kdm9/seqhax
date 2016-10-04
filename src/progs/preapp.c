@@ -1,6 +1,7 @@
 /*******************************************************************************
-*                      seq -- Misc sequence modification                      *
+*                  preapp -- Pre/Append strings to sequences                  *
 *******************************************************************************/
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,7 +13,7 @@
 
 
 static void
-seq_usage(FILE *stream)
+preapp_usage(FILE *stream)
 {
     fprintf(stream, "USAGE:\n");
     fprintf(stream, "    seqhax seq [options] FILE\n");
@@ -26,7 +27,7 @@ seq_usage(FILE *stream)
     fprintf(stream, "To accept reads from standard input, use '/dev/stdin' as\n");
     fprintf(stream, "the input file.\n");
 }
-static const char *seq_optstr = "fP:S:";
+static const char *preapp_optstr = "fP:S:";
 
 
 int
@@ -82,7 +83,7 @@ seq_print_presuf(struct qes_seq *seq, FILE *stream,
 *                                    MAIN                                     *
 *******************************************************************************/
 int
-seq_main(int argc, char *argv[])
+preapp_main(int argc, char *argv[])
 {
     int c = 0;
     bool fasta = false;
@@ -93,7 +94,7 @@ seq_main(int argc, char *argv[])
     const char *filename = NULL;
 
     /* Parse CLI options */
-    while ((c = getopt(argc, argv, seq_optstr)) >= 0) {
+    while ((c = getopt(argc, argv, preapp_optstr)) >= 0) {
         switch (c) {
         case 'f':
             fasta = true;
@@ -107,11 +108,11 @@ seq_main(int argc, char *argv[])
             suffixlen = strlen(suffix);
             break;
         case 'h':
-            seq_usage(stdout);
+            preapp_usage(stdout);
             return EXIT_SUCCESS;
             break;
         case '?':
-            seq_usage(stderr);
+            preapp_usage(stderr);
             return EXIT_FAILURE;
             break;
         }
@@ -120,7 +121,7 @@ seq_main(int argc, char *argv[])
         fprintf(stderr, "fasta\n");
     }
     if (optind >= argc) {
-        seq_usage(stderr);
+        preapp_usage(stderr);
         return EXIT_FAILURE;
     }
     filename = argv[optind];
