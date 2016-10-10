@@ -16,7 +16,7 @@ static void
 trunc_usage(FILE *stream)
 {
     fprintf(stream, "USAGE:\n");
-    fprintf(stream, "    seqhax seq [options] FILE\n");
+    fprintf(stream, "    seqhax trunc [options] FILE\n");
     fprintf(stream, "\n");
     fprintf(stream, "OPTIONS:\n");
     fprintf(stream, "    -l LEN     Fixed (integer) length to truncate at.\n");
