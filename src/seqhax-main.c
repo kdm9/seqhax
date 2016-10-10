@@ -3,10 +3,11 @@
 #include <string.h>
 
 static const char *programs[] = {
-    "randfq  -- Generate a random sequence file",
+    "anon    -- Rename sequences by a sequential number",
     "filter  -- Filter reads from a sequence file",
-    "trunc   -- Truncate sequences",
     "preapp  -- Prepend or append string to sequences",
+    "randfq  -- Generate a random sequence file",
+    "trunc   -- Truncate sequences",
     NULL
 };
 
@@ -15,18 +16,19 @@ struct seqhax_prog {
     int (*mainfunc)(int, char **);
 };
 
-int randfq_main(int argc, char *argv[]);
+int anon_main(int argc, char *argv[]);
 int filter_main(int argc, char *argv[]);
 int preapp_main(int argc, char *argv[]);
+int randfq_main(int argc, char *argv[]);
 int trunc_main(int argc, char *argv[]);
-int stat_main(int argc, char *argv[]);
 
 static const struct seqhax_prog program_mains[] = {
-    {"randfq", randfq_main},
-    {"filter", filter_main},
-    {"preapp", preapp_main},
-    {"trunc", trunc_main},
-    {NULL, NULL}
+    {"anon",    anon_main},
+    {"filter",  filter_main},
+    {"preapp",  preapp_main},
+    {"randfq",  randfq_main},
+    {"trunc",   trunc_main},
+    {NULL,      NULL}
 };
 
 
