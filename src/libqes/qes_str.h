@@ -88,19 +88,26 @@ qes_str_create (size_t capacity)
 }
 
 static inline int
-qes_str_fill_charptr (struct qes_str *str, const char *cp, size_t len)
+qes_str_resize (struct qes_str *str, size_t len)
 {
-    if (str == NULL || cp == NULL) return 0;
-    if (len == 0) {
-        len = strlen(cp);
-    }
+    if (str == NULL) return 0;
     if (str->capacity < len + 1) {
         while (str->capacity < len + 1) {
             str->capacity = qes_roundupz(str->capacity);
         }
         str->str = qes_realloc(str->str, str->capacity * sizeof(*str->str));
     }
-    /* FIXME: check for null after realloc */
+    return 1;
+}
+
+static inline int
+qes_str_fill_charptr (struct qes_str *str, const char *cp, size_t len)
+{
+    if (str == NULL || cp == NULL) return 0;
+    if (len == 0) {
+        len = strlen(cp);
+    }
+    qes_str_resize(str, len);
     memcpy(str->str, cp, len);
     str->str[len] = '\0';
     str->len = len;
@@ -127,7 +134,21 @@ qes_str_copy (struct qes_str *dest, const struct qes_str *src)
 {
     if (!qes_str_ok(src) || dest == NULL) return 1;
     if (!qes_str_ok(dest)) qes_str_init(dest, src->capacity);
+    else qes_str_resize(dest, src->capacity);
     memcpy(dest->str, src->str, src->capacity);
+    return 0;
+}
+
+static inline int
+qes_str_cat (struct qes_str *dest, const struct qes_str *src)
+{
+    if (!qes_str_ok(src) || dest == NULL) return 1;
+    if (!qes_str_ok(dest)) qes_str_init(dest, src->capacity);
+    else qes_str_resize(dest, dest->len + src->len);
+
+    memcpy(dest->str + dest->len, src->str, src->len);
+    dest->len += src->len;
+    dest->str[dest->len] = '\0';
     return 0;
 }
 

@@ -126,23 +126,14 @@ read_fasta_seqfile(struct qes_seqfile *seqfile, struct qes_seq *seq)
     /* we need to nullify seq, as we rely on seq.len being 0 as we enter this
      *  while loop */
     qes_str_nullify(&seq->seq);
+    qes_str_nullify(&seqfile->scratch);
     /* While the next char is not a '>', i.e. until next header line */
     while ((next = qes_file_peek(seqfile->qf)) != EOF && next != FASTA_DELIM) {
-        len = qes_file_readline(seqfile->qf, seq->seq.str + seq->seq.len,
-                seq->seq.capacity - seq->seq.len - 1);
+        len = qes_file_readline_str(seqfile->qf, &seqfile->scratch);
         if (len < 0) {
             goto error;
         }
-        seq->seq.len += len - 1;
-        seq->seq.str[seq->seq.len] = '\0';
-        if (seq->seq.capacity -  1 <= seq->seq.len) {
-            seq->seq.capacity = qes_roundupz(seq->seq.capacity);
-            seq->seq.str = qes_realloc(seq->seq.str,
-                    sizeof(*seq->seq.str) * seq->seq.capacity);
-            if (seq->seq.str == NULL) {
-                goto error;
-            }
-        }
+        qes_str_cat(&seq->seq, &seqfile->scratch);
     }
     seq->seq.str[seq->seq.len] = '\0';
     /* return seq len */

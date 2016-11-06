@@ -33,7 +33,7 @@ void
 qes_str_print (const struct qes_str *str, FILE *stream)
 {
     if (qes_str_ok(str)) {
-        fprintf(stream, "%s", str->str);
+        fwrite(str->str, 1, str->len, stream);
     }
 }
 

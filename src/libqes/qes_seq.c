@@ -186,13 +186,25 @@ qes_seq_destroy_(struct qes_seq *seq)
     }
 }
 
+inline void
+_printstr_linewrap(const struct qes_str *str, size_t linelen, FILE *stream)
+{
+
+    for (size_t i = 0; i < str->len; i += linelen) {
+        const size_t remaining = str->len - i;
+        const size_t towrite = remaining < linelen ? remaining : linelen;
+        fwrite(str->str + i, towrite, 1,  stream);
+        fputc('\n', stream);
+    }
+}
+
 int
 qes_seq_print(const struct qes_seq *seq, FILE *stream, bool fasta)
 {
     if (!qes_seq_ok(seq)) return 1;
     if (stream == NULL) return 1;
+    size_t linelen = fasta ? 79 : SIZE_MAX - 1;
 
-    if (seq->qual.len <= 0) fasta = true;
     if (fasta) {
         fputc('>', stream);
     } else {
@@ -204,12 +216,10 @@ qes_seq_print(const struct qes_seq *seq, FILE *stream, bool fasta)
         fputs(seq->comment.str, stream);
     }
     fputc('\n', stream);
-    fputs(seq->seq.str, stream);
-    fputc('\n', stream);
+    _printstr_linewrap(&seq->seq, linelen, stream);
     if (!fasta) {
         fputs("+\n", stream);
-        fputs(seq->qual.str, stream);
-        fputc('\n', stream);
+        _printstr_linewrap(&seq->qual, linelen, stream);
     }
     fflush(stream);
     return 0;
