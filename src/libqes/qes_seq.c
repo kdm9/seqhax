@@ -199,7 +199,7 @@ _printstr_linewrap(const struct qes_str *str, size_t linelen, FILE *stream)
 }
 
 int
-qes_seq_print(const struct qes_seq *seq, FILE *stream, bool fasta)
+qes_seq_print(const struct qes_seq *seq, FILE *stream, bool fasta, int tag)
 {
     if (!qes_seq_ok(seq)) return 1;
     if (stream == NULL) return 1;
@@ -211,6 +211,12 @@ qes_seq_print(const struct qes_seq *seq, FILE *stream, bool fasta)
         fputc('@', stream);
     }
     fputs(seq->name.str, stream);
+    if (tag > 0) {
+        // Add tag only if read is not already tagged.
+        if (seq->name.len > 2 && seq->name.str[seq->name.len - 2] != '/') {
+            fprintf(stream, "/%d", tag);
+        }
+    }
     if (seq->comment.str) {
         fputc(' ', stream);
         fputs(seq->comment.str, stream);

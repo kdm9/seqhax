@@ -118,19 +118,18 @@ randfq_main(int argc, char *argv[])
     }
 
     for (; num_seqs == 0 || n_recs < num_seqs; n_recs++) {
-        size_t namelen = 0;
         char readid[101] = "";
-        if (paired) {
-            namelen = snprintf(readid, 100, "pair:%zu/%zu", n_recs, (n_recs % 2) + 1);
-        } else {
-            namelen = snprintf(readid, 100, "read:%zu", n_recs);
-        }
+        int tag = 0;
+        const size_t namelen = snprintf(readid, 100, "read:%zu", n_recs);
         qes_seq_fill_name(seq, readid, namelen);
 
         randseq(&rng, sequence, seqlen);
         qes_seq_fill_seq(seq, sequence, seqlen);
         
-        qes_seq_print(seq, stdout, fasta);
+        if (paired) {
+            tag = (n_recs % 2) + 1;
+        }
+        qes_seq_print(seq, stdout, fasta, tag);
     }
     qes_seq_destroy(seq);
     free(sequence);

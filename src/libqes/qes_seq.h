@@ -180,15 +180,17 @@ extern int qes_seq_fill(struct qes_seq *seqobj, const char *name,
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_print
-Parameters:     const struct qes_seq *: seq to print
-                qes_seqfile_format_t: file format to print in.
-                FILE *: open file stream to print to.
+Parameters:     const struct qes_seq *seq: seq to print
+                FILE *stream: open file stream to print to.
+                bool fasta: Print as fasta?
+                int tag: Tag read name with /%d. use 0 to disable.
 Description:    Print ``seq`` in formatted per ``format`` to ``stream``.
 Returns:        int: 1 on success, 0 on failure.
  *===========================================================================*/
 int qes_seq_print              (const struct qes_seq   *seq,
                                 FILE                   *stream,
-                                bool                    fasta);
+                                bool                    fasta,
+                                int                     tag);
 
 /*===  FUNCTION  ============================================================*
 Name:           qes_seq_destroy

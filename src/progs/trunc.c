@@ -75,7 +75,7 @@ trunc_main(int argc, char *argv[])
             truncat = truncprop * seq->seq.len;
         }
         qes_seq_truncate(seq, truncat);
-        qes_seq_print(seq, stdout, !qes_seq_has_qual(seq));
+        qes_seq_print(seq, stdout, !qes_seq_has_qual(seq), 0);
         
     }
 

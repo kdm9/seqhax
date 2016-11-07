@@ -86,9 +86,6 @@ filter_main(int argc, char *argv[])
             break;
         }
     }
-    if (fasta) {
-        fprintf(stderr, "fasta\n");
-    }
     if (optind >= argc) {
         filter_usage(stderr);
         return EXIT_FAILURE;
@@ -113,15 +110,15 @@ filter_main(int argc, char *argv[])
 
         if (paired) {
             if (pass.r1 && pass.r2) {
-                qes_seq_print(r1, stdout, fasta);
-                qes_seq_print(r2, stdout, fasta);
+                qes_seq_print(r1, stdout, fasta, 1);
+                qes_seq_print(r2, stdout, fasta, 2);
             }
         } else {
             if (pass.r1) {
-                qes_seq_print(r1, stdout, fasta);
+                qes_seq_print(r1, stdout, fasta, 0);
             }
             if (pass.r2) {
-                qes_seq_print(r2, stdout, fasta);
+                qes_seq_print(r2, stdout, fasta, 0);
             }
         }
     }
