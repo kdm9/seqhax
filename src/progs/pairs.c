@@ -27,6 +27,7 @@ pairs_usage(FILE *stream)
     fprintf(stream, "    -u FILE    Unpaired read output\n");
     fprintf(stream, "    -s FILE    Strict interleaved output\n");
     fprintf(stream, "    -b FILE    Broken paired output\n");
+    fprintf(stream, "    -y FILE    Output statistics to FILE.\n");
     fprintf(stream, "\n");
     fprintf(stream, "Output files are NOT compressed. To apply compression, please use\n");
     fprintf(stream, "Subprocess streams, e.g.:\n");
@@ -40,7 +41,7 @@ pairs_usage(FILE *stream)
     fprintf(stream, "To accept reads from standard input, use '/dev/stdin' as\n");
     fprintf(stream, "the input file. To output to standard output, use '-'.\n");
 }
-static const char *pairs_optstr = "fl:1:2:u:s:b:h";
+static const char *pairs_optstr = "fl:1:2:u:s:b:y:h";
 
 /*******************************************************************************
 *                                   Helpers                                   *
@@ -81,6 +82,7 @@ pairs_main(int argc, char *argv[])
     const char *r1file = NULL;
     const char *r2file = NULL;
     const char *rsfile = NULL;
+    const char *statsfile = NULL;
     bool strictpaired = false;
     char outmode[2] = "x";
 
@@ -106,6 +108,9 @@ pairs_main(int argc, char *argv[])
             break;
         case 'u':
             rsfile = optarg;
+            break;
+        case 'y':
+            statsfile = optarg;
             break;
         case 'l':
             min_len = (ssize_t) atol(optarg);
@@ -273,12 +278,27 @@ pairs_main(int argc, char *argv[])
             }
         }
     }
-    fprintf(stderr, "---\nstats:\n");
-    fprintf(stderr, "  proper_pairs: %zu\n", npair);
-    fprintf(stderr, "  single_r1: %zu\n", nr1s);
-    fprintf(stderr, "  single_r2: %zu\n", nr2s);
-    fprintf(stderr, "  unpaired_reads: %zu\n", nsingle);
-    fprintf(stderr, "  failed: %zu\n", nfail);
+    FILE *statsfp = stderr;
+    if (statsfile != NULL) {
+        statsfp = fopen(statsfile, "w");
+        if (statsfp == NULL) {
+            fprintf(stderr, "ERROR: Could not open stats file '%s'. "
+                    "Using stderr.\n", statsfile);
+            statsfp = stderr;
+        }
+    }
+    fprintf(statsfp, "---\n");
+    fprintf(statsfp, "files:\n");
+    fprintf(statsfp, "  - \"%s\"\n", infile1);
+    if (infile2) {
+        fprintf(statsfp, "  - \"%s\"\n", infile2);
+    }
+    fprintf(statsfp, "stats:\n");
+    fprintf(statsfp, "  proper_pairs: %zu\n", npair);
+    fprintf(statsfp, "  single_r1: %zu\n", nr1s);
+    fprintf(statsfp, "  single_r2: %zu\n", nr2s);
+    fprintf(statsfp, "  unpaired_reads: %zu\n", nsingle);
+    fprintf(statsfp, "  failed: %zu\n", nfail);
 
     if (sf1 != sf2) {
         qes_seqfile_destroy(sf2);
@@ -286,5 +306,6 @@ pairs_main(int argc, char *argv[])
     qes_seqfile_destroy(sf1);
     qes_seq_destroy(r1);
     qes_seq_destroy(r2);
+    fcloseall();
     return EXIT_SUCCESS;
 } 
