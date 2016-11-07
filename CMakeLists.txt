@@ -28,7 +28,7 @@ MESSAGE(STATUS "${CMAKE_BUILD_TYPE} build of ${PROJECT_NAME} version: ${VERSION}
 
 # CC options
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -DSHX_VERSION=\\\"${VERSION}\\\" -D_GNU_SOURCE")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -Wall")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -Wall -Wpedantic")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O4 -Werror")
 
 ###############################
