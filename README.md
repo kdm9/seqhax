@@ -35,20 +35,25 @@ USAGE:
     seqhax PROGRAM [options]
 
 where PROGRAM is one of:
-    randfq  -- Generate a random sequence file
-    filter  -- Filter reads from a sequence file
-    seq     -- Miscellaneous sequence modification
+    anon       -- Rename sequences by a sequential number
+    filter     -- Filter reads from a sequence file
+    pairs      -- (De)interleave paired end reads
+    preapp     -- Prepend or append string to sequences
+    randseq    -- Generate a random sequence file
+    trunc      -- Truncate sequences
 ```
 
 The usage of each subcommand can be obtained using the `-h` flag to that
-parameter, e.g. `seqhax seq -h`.
+subcommand, e.g. `seqhax seq -h`.
 
 
 ## Sub-commands
 
-#### `randfq`
 
-Generates a fasta or fastq file containing sequences with random sequences.
+#### `anon`
+
+Re-name sequences with a sequential numeric ID.
+
 
 #### `filter`
 
@@ -57,16 +62,33 @@ Removes sequences based on certain criteria:
 - Length
 * Pairing
 
+#### `pairs`
 
-#### `seq`
+Interleaves or de-interleaves paired reads. Converts between the following
+forms:
 
-Implements the following functions
+- Separate R1/R2 paired files and single read read file.
+- "Strict" interleaved file, where failed/missing reads are replaced with a
+  single 'N'.
+* "Broken paired" interleaved files, where failed/missing reads are simply not
+  present.
 
-- Addition of a constant prefix and/or suffix to each sequence.
+
+#### `preapp`
+
+Addition of a constant prefix and/or suffix to each sequence.
+
+#### `randseq`
+
+Generates a fasta or fastq file containing sequences with random sequences.
 
 
-License
-=======
+#### `trunc`
+
+Truncates reads at given length.
+
+
+# License
 
 GPL v3 (see ./LICENSE).
 
