@@ -148,7 +148,7 @@ pairs_main(int argc, char *argv[])
             ilfp = fopen(ilfile, outmode);
         }
         if (ilfp == NULL) {
-            fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f).\n",
+            fprintf(stderr, "Could not open '%s' for IL output. Perhaps it already exists? (use -f).\n",
                     ilfile);
             fputc('\n', stderr);
             pairs_usage(stderr);
@@ -197,6 +197,7 @@ pairs_main(int argc, char *argv[])
 
     struct qes_seq *r1 = qes_seq_create();
     struct qes_seq *r2 = qes_seq_create();
+    struct qes_seq *tmpread = NULL;
     struct qes_seqfile *sf1 = qes_seqfile_create(infile1, "r");
     struct qes_seqfile *sf2 = sf1;
     if (infile2 != NULL) {
@@ -204,56 +205,27 @@ pairs_main(int argc, char *argv[])
     }
     int fasta = -1;
     ssize_t npair = 0, nr1s = 0, nr2s = 0, nsingle=0, nfail = 0;
+    bool seekpair = false;
+    size_t nread = 0;
     while (1) {
-        ssize_t res1 = qes_seqfile_read(sf1, r1);
+        ssize_t res1 = 0;
+        if (!seekpair) {
+            res1 = qes_seqfile_read(sf1, r1);
+        }
         ssize_t res2 = qes_seqfile_read(sf2, r2);
-        if (res1 < 1 &&  res2 < 1) {
+        if ((seekpair || res1 < 1) &&  res2 < 1) {
             break;
         }
-
-        bool r1pass = res1 >= min_len;
+        bool r1pass = seekpair || res1 >= min_len;
         bool r2pass = res2 >= min_len;
+        nread += seekpair ? 1 : 2;
+        seekpair = false;
 
-        if (fasta < 0) fasta = r1->qual.len == 0;
-
-        if (!r1pass && !r2pass) {
-            nfail += 2;
-            continue;
-        }
+        // Detect if we should use fasta from first 2 read qualities
+        if (fasta < 0) fasta = r1->qual.len == 0 && r2->qual.len == 0;
 
         bool is_pair = ispaired(r1, r2);
-
-        if (is_pair) {
-            if (r1pass && r2pass) {
-                qes_seq_print(r1, r1fp, fasta, 1);
-                qes_seq_print(r2, r2fp, fasta, 2);
-                npair ++;
-            } else {
-                if (strictpaired) {
-                    if (!r1pass) {
-                        qes_seq_fill_seq(r1, "N", 1);
-                        qes_seq_fill_qual(r1, "I", 1);
-                        nr2s++;
-                    } else {
-                        // r2 must have failed
-                        qes_seq_fill_seq(r2, "N", 1);
-                        qes_seq_fill_qual(r2, "I", 1);
-                        nr1s++;
-                    }
-                    qes_seq_print(r1, r1fp, fasta, 1);
-                    qes_seq_print(r2, r2fp, fasta, 2);
-                } else {
-                    if (r1pass) {
-                        qes_seq_print(r1, rsfp, fasta, 1);
-                        nr1s++;
-                    }
-                    if (r2pass) {
-                        qes_seq_print(r2, rsfp, fasta, 2);
-                        nr2s++;
-                    }
-                }
-            }
-        } else { // Not a pair
+        if (!is_pair) {
             if (r1pass) {
                 qes_seq_print(r1, rsfp, fasta, 0);
                 nsingle++;
@@ -266,18 +238,55 @@ pairs_main(int argc, char *argv[])
                 nfail++;
             }
             if (r2pass) {
-                qes_seq_print(r2, rsfp, fasta, 0);
-                nsingle++;
-                if (strictpaired) {
-                    qes_seq_fill_seq(r2, "N", 1);
-                    qes_seq_fill_qual(r2, "I", 1);
-                    qes_seq_print(r2, rsfp, fasta, 0);
-                }
+                // Swap so R2 is now R1
+                tmpread = r1;
+                r1 = r2;
+                r2 = tmpread;
+                seekpair = true;
             } else {
                 nfail++;
             }
+            continue;
+        }
+
+
+        if (!r1pass && !r2pass) {
+            nfail += 2;
+            continue;
+        }
+
+
+        if (r1pass && r2pass) {
+            qes_seq_print(r1, r1fp, fasta, 1);
+            qes_seq_print(r2, r2fp, fasta, 2);
+            npair ++;
+        } else {
+            if (strictpaired) {
+                if (!r1pass) {
+                    qes_seq_fill_seq(r1, "N", 1);
+                    qes_seq_fill_qual(r1, "I", 1);
+                    nr2s++;
+                } else {
+                    // r2 must have failed
+                    qes_seq_fill_seq(r2, "N", 1);
+                    qes_seq_fill_qual(r2, "I", 1);
+                    nr1s++;
+                }
+                qes_seq_print(r1, r1fp, fasta, 1);
+                qes_seq_print(r2, r2fp, fasta, 2);
+            } else {
+                if (r1pass) {
+                    qes_seq_print(r1, rsfp, fasta, 1);
+                    nr1s++;
+                }
+                if (r2pass) {
+                    qes_seq_print(r2, rsfp, fasta, 2);
+                    nr2s++;
+                }
+            }
         }
     }
+    fprintf(stderr, "Finished, processed %zu reads\n", nread);
     FILE *statsfp = stderr;
     if (statsfile != NULL) {
         statsfp = fopen(statsfile, "w");
@@ -294,6 +303,7 @@ pairs_main(int argc, char *argv[])
         fprintf(statsfp, "  - \"%s\"\n", infile2);
     }
     fprintf(statsfp, "stats:\n");
+    fprintf(statsfp, "  total_reads: %zu\n", nread);
     fprintf(statsfp, "  proper_pairs: %zu\n", npair);
     fprintf(statsfp, "  single_r1: %zu\n", nr1s);
     fprintf(statsfp, "  single_r2: %zu\n", nr2s);
