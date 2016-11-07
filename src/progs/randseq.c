@@ -1,5 +1,5 @@
 /*******************************************************************************
-*                  randfq -- Creates a random sequence file                   *
+*                  randseq -- Creates a random sequence file                   *
 *******************************************************************************/
 
 
@@ -15,10 +15,10 @@
 #include "pcg_variants.h"
 
 static void
-randfq_usage(FILE *stream)
+randseq_usage(FILE *stream)
 {
     fprintf(stream, "USAGE:\n");
-    fprintf(stream, "    seqhax randfq [options]\n");
+    fprintf(stream, "    seqhax randseq [options]\n");
     fprintf(stream, "\n");
     fprintf(stream, "OPTIONS:\n");
     fprintf(stream, "    -n READS   Number of reads. Use 0 for infinite. [default 1000]\n");
@@ -27,7 +27,7 @@ randfq_usage(FILE *stream)
     fprintf(stream, "    -p         Paired reads [default false]\n");
     fprintf(stream, "    -f         Output as fasta (no qualities)\n");
 }
-static const char *randfq_optstr = "n:s:l:pfh";
+static const char *randseq_optstr = "n:s:l:pfh";
 
 static inline void
 randseq(pcg32_random_t *rng, char *seq, size_t len)
@@ -47,7 +47,7 @@ randseq(pcg32_random_t *rng, char *seq, size_t len)
 }
 
 int
-randfq_main(int argc, char *argv[])
+randseq_main(int argc, char *argv[])
 {
     struct qes_seq *seq;
     size_t n_recs = 0;
@@ -59,7 +59,7 @@ randfq_main(int argc, char *argv[])
     bool fasta = false;
     int c;
 
-    while ((c = getopt(argc, argv, randfq_optstr)) > 0) {
+    while ((c = getopt(argc, argv, randseq_optstr)) > 0) {
         switch (c) {
             case 'n':
                 num_seqs = strtoull(optarg, NULL, 10);
@@ -68,7 +68,7 @@ randfq_main(int argc, char *argv[])
                 seed = strtoul(optarg, NULL, 10);
                 if (errno != 0) {
                     fprintf(stderr, "Invalid seed '%s'\n\n", optarg);
-                    randfq_usage(stderr);
+                    randseq_usage(stderr);
                     return EXIT_FAILURE;
                 }
                 break;
@@ -76,7 +76,7 @@ randfq_main(int argc, char *argv[])
                 seqlen = strtoull(optarg, NULL, 10);
                 if (seqlen > UINT32_MAX) {
                     fprintf(stderr, "Invalid read length '%s'\n\n", optarg);
-                    randfq_usage(stderr);
+                    randseq_usage(stderr);
                     return EXIT_FAILURE;
                 }
                 break;
@@ -88,7 +88,7 @@ randfq_main(int argc, char *argv[])
                 break;
             case 'h':
             default:
-                randfq_usage(stderr);
+                randseq_usage(stderr);
                 return EXIT_FAILURE;
                 break;
         }
