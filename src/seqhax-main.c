@@ -57,6 +57,9 @@ main(int argc, char *argv[])
         seqhax_usage(stdout);
         return EXIT_SUCCESS;
     }
+
+    fprintf(stderr, "seqhax version: " SHX_VERSION "\n\n");
+
     const struct seqhax_prog *program = program_mains;
     for (program = program_mains; program->name; program++) {
         if (strcmp(argv[1], program->name) == 0) {
