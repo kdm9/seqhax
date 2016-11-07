@@ -51,25 +51,17 @@ bool
 ispaired(struct qes_seq *r1, struct qes_seq *r2)
 {
     if (!qes_seq_ok(r1) || !qes_seq_ok(r2)) return false;
-    puts("1");
     if (r1->name.len == 0 || r2->name.len == 0) return false;
-    puts("2");
     if (r1->name.len != r2->name.len) return false;
-    puts("3");
     for (size_t i = 0; i < r1->name.len; i++) {
         if (r1->name.str[i] != r2->name.str[i]) {
-            puts("4");
             if (i == r1->name.len - 2 && r1->name.str[i] == '/') {
-                puts("t");
                 return true;
             }
-            puts("5");
             return false;
         }
-        puts("6");
         return true;
     }
-    puts("7");
     return true;
 }
 
