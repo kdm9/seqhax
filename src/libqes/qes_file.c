@@ -73,7 +73,15 @@ qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
     /* create file struct */
     qf = qes_calloc(1, sizeof(*qf));
     /* Open file, handling any errors */
-    qf->fp = QES_ZOPEN(path, mode);
+    if (strcmp(path, "-") == 0) {
+        if (tolower(mode[0]) == 'r') {
+            qf->fp = QES_ZDOPEN(STDIN_FILENO, mode);
+        } else {
+            qf->fp = QES_ZDOPEN(STDOUT_FILENO, mode);
+        }
+    } else {
+        qf->fp = QES_ZOPEN(path, mode);
+    }
     if (qf->fp == NULL) {
         (*onerr)("Opening file %s failed:\n%s\n", file, line,
                 path, strerror(errno));
