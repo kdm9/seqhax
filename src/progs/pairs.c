@@ -24,9 +24,10 @@ pairs_usage(FILE *stream)
     fprintf(stream, "    -l LENGTH  Minimum length of each read. [default 1]\n");
     fprintf(stream, "    -1 FILE    Pair first mate output\n");
     fprintf(stream, "    -2 FILE    Pair second mate output\n");
+    fprintf(stream, "    -p FILE    Interleaved pairs-only output\n");
     fprintf(stream, "    -u FILE    Unpaired read output\n");
-    fprintf(stream, "    -s FILE    Strict interleaved output\n");
-    fprintf(stream, "    -b FILE    Broken paired output\n");
+    fprintf(stream, "    -s FILE    \"Strict interleaved\" output, all reads\n");
+    fprintf(stream, "    -b FILE    \"Broken paired\" output, all reads\n");
     fprintf(stream, "    -y FILE    Output statistics to FILE.\n");
     fprintf(stream, "\n");
     fprintf(stream, "Output files are NOT compressed. To apply compression, please use\n");
@@ -41,7 +42,7 @@ pairs_usage(FILE *stream)
     fprintf(stream, "To accept reads from standard input, use '/dev/stdin' as\n");
     fprintf(stream, "the input file. To output to standard output, use '-'.\n");
 }
-static const char *pairs_optstr = "fl:1:2:u:s:b:y:h";
+static const char *pairs_optstr = "fl:1:2:p:u:s:b:y:h";
 
 /*******************************************************************************
 *                                   Helpers                                   *
@@ -82,6 +83,7 @@ pairs_main(int argc, char *argv[])
     const char *r1file = NULL;
     const char *r2file = NULL;
     const char *rsfile = NULL;
+    const char *paironlyfile = NULL;
     const char *statsfile = NULL;
     bool strictpaired = false;
     char outmode[2] = "x";
@@ -108,6 +110,9 @@ pairs_main(int argc, char *argv[])
             break;
         case 'u':
             rsfile = optarg;
+            break;
+        case 'p':
+            paironlyfile = optarg;
             break;
         case 'y':
             statsfile = optarg;
@@ -158,30 +163,41 @@ pairs_main(int argc, char *argv[])
         r2fp = ilfp;
         rsfp = ilfp;
     } else {
-        if (r1file == NULL || r2file == NULL || rsfile == NULL) {
-            fputs("To split reads to separate files, -1, -2 and -s must all be specified.\n", stderr);
+        if ((paironlyfile == NULL && (r1file == NULL || r2file == NULL))) {
+            fputs("Either -s, -b, -p, or  -1 AND -2 must be specified.\n", stderr);
             fputs("Use /dev/null as filename to discard.\n", stderr);
             fputc('\n', stderr);
             pairs_usage(stderr);
             return EXIT_FAILURE;
         }
 
-        r1fp = fopen(r1file, outmode);
-        if (r1fp == NULL) {
-            fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
-                    r1file);
+        if (paironlyfile != NULL) {
+            r1fp = fopen(paironlyfile, outmode);
+            if (r1fp == NULL) {
+                fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
+                        r1file);
+            }
+            r2fp = r1fp;
+        } else {
+            r1fp = fopen(r1file, outmode);
+            if (r1fp == NULL) {
+                fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
+                        r1file);
+            }
+            r2fp = fopen(r2file, outmode);
+            if (r2fp == NULL) {
+                fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
+                        r2file);
+            }
         }
-        r2fp = fopen(r2file, outmode);
-        if (r2fp == NULL) {
-            fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
-                    r2file);
+        if (rsfile != NULL) {
+            rsfp = fopen(rsfile, outmode);
+            if (rsfp == NULL) {
+                fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
+                        rsfile);
+            }
         }
-        rsfp = fopen(rsfile, outmode);
-        if (rsfp == NULL) {
-            fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
-                    rsfile);
-        }
-        if (r1fp == NULL || r2fp == NULL || rsfp == NULL) {
+        if (r1fp == NULL || r2fp == NULL) {
             if (r1fp != NULL) fclose(r1fp);
             if (r2fp != NULL) fclose(r2fp);
             if (rsfp != NULL) fclose(rsfp);
