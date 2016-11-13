@@ -9,6 +9,7 @@ static const char *programs[] = {
     "pairs      -- (De)interleave paired end reads",
     "preapp     -- Prepend or append string to sequences",
     "randseq    -- Generate a random sequence file",
+    "stats      -- Basic statistics about sequence files",
     "trunc      -- Truncate sequences",
     NULL
 };
@@ -24,6 +25,7 @@ int filter_main(int argc, char *argv[]);
 int pairs_main(int argc, char *argv[]);
 int preapp_main(int argc, char *argv[]);
 int randseq_main(int argc, char *argv[]);
+int stats_main(int argc, char *argv[]);
 int trunc_main(int argc, char *argv[]);
 
 static const struct seqhax_prog program_mains[] = {
@@ -33,6 +35,7 @@ static const struct seqhax_prog program_mains[] = {
     {"pairs",   pairs_main},
     {"preapp",  preapp_main},
     {"randseq", randseq_main},
+    {"stats",   stats_main},
     {"trunc",   trunc_main},
     {NULL,      NULL}
 };
