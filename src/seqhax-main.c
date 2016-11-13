@@ -57,11 +57,10 @@ int
 main(int argc, char *argv[])
 {
     if (argc < 2) {
+        fprintf(stdout, "seqhax version: " SHX_VERSION "\n\n");
         seqhax_usage(stdout);
         return EXIT_SUCCESS;
     }
-
-    fprintf(stderr, "seqhax version: " SHX_VERSION "\n\n");
 
     const struct seqhax_prog *program = program_mains;
     for (program = program_mains; program->name; program++) {
