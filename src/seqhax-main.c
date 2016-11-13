@@ -4,6 +4,7 @@
 
 static const char *programs[] = {
     "anon       -- Rename sequences by a sequential number",
+    "convert    -- Convert between FASTA and FASTQ formats",
     "filter     -- Filter reads from a sequence file",
     "pairs      -- (De)interleave paired end reads",
     "preapp     -- Prepend or append string to sequences",
@@ -18,6 +19,7 @@ struct seqhax_prog {
 };
 
 int anon_main(int argc, char *argv[]);
+int convert_main(int argc, char *argv[]);
 int filter_main(int argc, char *argv[]);
 int pairs_main(int argc, char *argv[]);
 int preapp_main(int argc, char *argv[]);
@@ -26,6 +28,7 @@ int trunc_main(int argc, char *argv[]);
 
 static const struct seqhax_prog program_mains[] = {
     {"anon",    anon_main},
+    {"convert", convert_main},
     {"filter",  filter_main},
     {"pairs",   pairs_main},
     {"preapp",  preapp_main},
