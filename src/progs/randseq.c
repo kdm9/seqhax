@@ -12,7 +12,7 @@
 #include <time.h>
 
 #include "qes_seq.h"
-#include "pcg_variants.h"
+#include "pcg-c/pcg_variants.h"
 
 static void
 randseq_usage(FILE *stream)

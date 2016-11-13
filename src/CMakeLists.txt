@@ -3,6 +3,8 @@ ADD_SUBDIRECTORY(ext/libqes)
 
 file(GLOB CMD_SOURCES progs/*.c)
 
+INCLUDE_DIRECTORIES(ext)
+
 # Targets
 ADD_EXECUTABLE(seqhax seqhax-main.c ${CMD_SOURCES})
 TARGET_LINK_LIBRARIES(seqhax qes_static ${SEQHAX_LIB_DEPENDS})
