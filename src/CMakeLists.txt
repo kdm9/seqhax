@@ -1,10 +1,9 @@
 SET(LIBQES_AS_SUBMODULE True)
 ADD_SUBDIRECTORY(ext/libqes)
 
-file(GLOB LIB_SOURCES lib/*.c)
 file(GLOB CMD_SOURCES progs/*.c)
 
 # Targets
-ADD_EXECUTABLE(seqhax seqhax-main.c ${LIB_SOURCES} ${CMD_SOURCES})
+ADD_EXECUTABLE(seqhax seqhax-main.c ${CMD_SOURCES})
 TARGET_LINK_LIBRARIES(seqhax qes_static ${SEQHAX_LIB_DEPENDS})
 INSTALL(TARGETS seqhax DESTINATION "bin")
