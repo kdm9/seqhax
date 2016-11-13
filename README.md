@@ -36,10 +36,12 @@ USAGE:
 
 where PROGRAM is one of:
     anon       -- Rename sequences by a sequential number
+    convert    -- Convert between FASTA and FASTQ formats
     filter     -- Filter reads from a sequence file
     pairs      -- (De)interleave paired end reads
     preapp     -- Prepend or append string to sequences
     randseq    -- Generate a random sequence file
+    stats      -- Basic statistics about sequence files
     trunc      -- Truncate sequences
 ```
 
@@ -55,12 +57,18 @@ subcommand, e.g. `seqhax seq -h`.
 Re-name sequences with a sequential numeric ID.
 
 
+#### `convert`
+
+Convert between FASTA and FASTQ formats.
+
+
 #### `filter`
 
 Removes sequences based on certain criteria:
 
 - Length
 * Pairing
+
 
 #### `pairs`
 
@@ -78,9 +86,16 @@ forms:
 
 Addition of a constant prefix and/or suffix to each sequence.
 
+
 #### `randseq`
 
 Generates a fasta or fastq file containing sequences with random sequences.
+
+
+#### `stats`
+
+Counts number of reads and basepairs in sequence files, and outputs a
+convenient table.
 
 
 #### `trunc`
