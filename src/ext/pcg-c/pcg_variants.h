@@ -48,7 +48,7 @@
 #endif
 
 #if __GNUC_GNU_INLINE__  &&  !defined(__cplusplus)
-    #error Nonstandard GNU inlining semantics. Compile with -std=c99 or better.
+    //#error Nonstandard GNU inlining semantics. Compile with -std=c99 or better.
     // We could instead use macros PCG_INLINE and PCG_EXTERN_INLINE
     // but better to just reject ancient C code.
 #endif
