@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <getopt.h>
 #include <assert.h>
+#include <omp.h>
 
 #include "qes_seqfile.h"
 
@@ -17,8 +18,11 @@ stats_usage(FILE *stream)
 {
     fprintf(stream, "USAGE:\n");
     fprintf(stream, "    seqhax stats FILE ...\n");
+    fprintf(stream, "\n");
+    fprintf(stream, "OPTIONS:\n");
+    fprintf(stream, "    -t THREADS  Number of parallel jobs [1]\n");
 }
-static const char *stats_optstr = "";
+static const char *stats_optstr = "t:";
 
 
 
@@ -29,11 +33,14 @@ int
 stats_main(int argc, char *argv[])
 {
     int c = 0;
-    const char *filename = NULL;
+    int n_threads = 1;
 
     /* Parse CLI options */
     while ((c = getopt(argc, argv, stats_optstr)) >= 0) {
         switch (c) {
+        case 't':
+            n_threads = atoi(optarg);
+            break;
         case 'h':
             stats_usage(stdout);
             return EXIT_SUCCESS;
@@ -50,8 +57,9 @@ stats_main(int argc, char *argv[])
     }
 
     puts("filename\treads\tbases");
-    for (; optind < argc; optind++) {
-        filename = argv[optind];
+    #pragma omp parallel for num_threads(n_threads) schedule(dynamic)
+    for (int file = optind; file < argc; file++) {
+        const char *filename = argv[file];
         struct qes_seq *seq = qes_seq_create();
         struct qes_seqfile *sf = qes_seqfile_create(filename, "r");
         size_t n_reads = 0;
@@ -60,10 +68,13 @@ stats_main(int argc, char *argv[])
             n_reads++;
             n_bp += seq->seq.len;
         }
-        if (n_reads == 0) {
-            fprintf(stderr, "WARNING: Invalid or empty file '%s'\n", filename);
+        #pragma omp critical
+        {
+            if (n_reads == 0) {
+                fprintf(stderr, "WARNING: Invalid or empty file '%s'\n", filename);
+            }
+            printf("%s\t%zu\t%zu\n", filename, n_reads, n_bp);
         }
-        printf("%s\t%zu\t%zu\n", filename, n_reads, n_bp);
         qes_seqfile_destroy(sf);
         qes_seq_destroy(seq);
     }
