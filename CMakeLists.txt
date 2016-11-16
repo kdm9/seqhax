@@ -4,6 +4,22 @@ PROJECT(seqhax C)
 # Cmake options
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libqes/cmake-modules")
 
+#############
+## Options ##
+#############
+
+option(STATIC_BUILD "Build a static binary" OFF)
+
+if (STATIC_BUILD)
+    message(STATUS "Building static ${PROJECT_NAME} binaries")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static ")
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+endif()
+
+###########
+## Flags ##
+###########
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -15,20 +31,20 @@ ENDIF()
 
 
 IF (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/version")
-	FILE(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/version" VERSION)
+    FILE(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/version" SHX_VERSION)
 ELSE()
 	# git describe as versioning
-	EXECUTE_PROCESS(COMMAND git describe
+	EXECUTE_PROCESS(COMMAND git describe --always --dirty
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-			OUTPUT_VARIABLE VERSION
+            OUTPUT_VARIABLE SHX_VERSION
 			OUTPUT_STRIP_TRAILING_WHITESPACE)
 ENDIF()
 
 MESSAGE(STATUS "${CMAKE_BUILD_TYPE} build of ${PROJECT_NAME} version: ${VERSION}")
 
 # CC options
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -DSHX_VERSION=\\\"${VERSION}\\\" -D_GNU_SOURCE")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -Wall -Wpedantic")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -std=c11 -DSHX_VERSION=\\\"${SHX_VERSION}\\\" -D_GNU_SOURCE")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb -pedantic")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O4")
 
 ###############################
