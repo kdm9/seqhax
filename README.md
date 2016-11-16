@@ -19,8 +19,9 @@ make
 make install
 ```
 
-Any other issues, file a [bug report on
-github](https://github.com/kdmurray91/seqhax/issues).
+To make static binaries, one can use `cmake -DSTATIC_BUILD=On ..` in the above series of commands.
+
+Any other issues, file a [bug report on github](https://github.com/kdmurray91/seqhax/issues).
 
 Documentation
 =============
