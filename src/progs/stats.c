@@ -56,7 +56,7 @@ stats_main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    puts("filename\treads\tbases");
+    puts("filename\treads\tbases\tperc_gc\tnon_acgt");
     #pragma omp parallel for num_threads(n_threads) schedule(dynamic)
     for (int file = optind; file < argc; file++) {
         const char *filename = argv[file];
@@ -64,16 +64,26 @@ stats_main(int argc, char *argv[])
         struct qes_seqfile *sf = qes_seqfile_create(filename, "r");
         size_t n_reads = 0;
         size_t n_bp = 0;
+        size_t comp[128] = {0};
         while (qes_seqfile_read(sf, seq) > 0) {
             n_reads++;
             n_bp += seq->seq.len;
+            for (size_t i = 0; i < seq->seq.len; i++) {
+                comp[seq->seq.str[i] & 0xdf] += 1;
+            }
         }
+        ssize_t at = comp['A'] + comp['T'];
+        ssize_t gc = comp['C'] + comp['G'];
+        ssize_t acgt = at + gc;
+        ssize_t non_acgt = n_bp - acgt;
+        float prop_gc = (float) gc / (float) acgt;
         #pragma omp critical
         {
             if (n_reads == 0) {
                 fprintf(stderr, "WARNING: Invalid or empty file '%s'\n", filename);
             }
-            printf("%s\t%zu\t%zu\n", filename, n_reads, n_bp);
+            printf("%s\t%zu\t%zu\t%0.1f\t%zu\n", filename, n_reads, n_bp,
+                        prop_gc * 100, non_acgt);
         }
         qes_seqfile_destroy(sf);
         qes_seq_destroy(seq);
