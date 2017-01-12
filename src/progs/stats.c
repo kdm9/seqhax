@@ -84,6 +84,7 @@ stats_main(int argc, char *argv[])
             }
             printf("%s\t%zu\t%zu\t%0.1f\t%zu\n", filename, n_reads, n_bp,
                         prop_gc * 100, non_acgt);
+            fflush(stdout);
         }
         qes_seqfile_destroy(sf);
         qes_seq_destroy(seq);
