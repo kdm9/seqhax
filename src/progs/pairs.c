@@ -9,6 +9,9 @@
 #include <stdint.h>
 #include <getopt.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "qes_seqfile.h"
 
@@ -48,6 +51,13 @@ static const char *pairs_optstr = "fl:1:2:p:u:s:b:y:h";
 *                                   Helpers                                   *
 *******************************************************************************/
 
+bool
+isfilepipe(const char *filename)
+{
+    struct stat res;
+    if (stat(filename, &res) != 0) return 0;
+    return (S_ISFIFO(res.st_mode));
+}
 
 bool
 ispaired(struct qes_seq *r1, struct qes_seq *r2)
@@ -149,8 +159,9 @@ pairs_main(int argc, char *argv[])
         FILE *ilfp;
         if (strcmp(ilfile, "-") == 0 || strcmp(ilfile, "/dev/stdout") == 0) {
             ilfp = stdout;
-        } else {
-            ilfp = fopen(ilfile, outmode);
+        } else  {
+            const char *om = isfilepipe(ilfile) ? "w" : outmode;
+            ilfp = fopen(ilfile, om);
         }
         if (ilfp == NULL) {
             fprintf(stderr, "Could not open '%s' for IL output. Perhaps it already exists? (use -f).\n",
@@ -172,26 +183,30 @@ pairs_main(int argc, char *argv[])
         }
 
         if (paironlyfile != NULL) {
-            r1fp = fopen(paironlyfile, outmode);
+            const char *om = isfilepipe(paironlyfile) ? "w" : outmode;
+            r1fp = fopen(paironlyfile, om);
             if (r1fp == NULL) {
                 fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
                         r1file);
             }
             r2fp = r1fp;
         } else {
-            r1fp = fopen(r1file, outmode);
+            const char *om = isfilepipe(r1file) ? "w" : outmode;
+            r1fp = fopen(r1file, om);
             if (r1fp == NULL) {
                 fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
                         r1file);
             }
-            r2fp = fopen(r2file, outmode);
+            om = isfilepipe(r2file) ? "w" : outmode;
+            r2fp = fopen(r2file, om);
             if (r2fp == NULL) {
                 fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
                         r2file);
             }
         }
         if (rsfile != NULL) {
-            rsfp = fopen(rsfile, outmode);
+            const char *om = isfilepipe(rsfile) ? "w" : outmode;
+            rsfp = fopen(rsfile, om);
             if (rsfp == NULL) {
                 fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
                         rsfile);
