@@ -362,4 +362,4 @@ pairs_main(int argc, char *argv[])
     qes_seq_destroy(r2);
     fcloseall();
     return EXIT_SUCCESS;
-} 
+}
