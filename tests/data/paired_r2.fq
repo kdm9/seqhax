@@ -1,16 +1,16 @@
-@read1/2
+@1/2
 AAA
 +
 III
-@read2 2:...
+@2/2
 AAA
 +
 III
-@shortread1/2
+@3/2
 AA
 +
 II
-@shortread2 2
+@4/2
 AA
 +
 II
