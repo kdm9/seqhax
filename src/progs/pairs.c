@@ -191,7 +191,7 @@ pairs_main(int argc, char *argv[])
             r1fp = fopen(paironlyfile, om);
             if (r1fp == NULL) {
                 fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
-                        r1file);
+                        paironlyfile);
             }
             r2fp = r1fp;
         } else {
