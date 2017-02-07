@@ -217,7 +217,7 @@ qes_seq_print(const struct qes_seq *seq, FILE *stream, bool fasta, int tag)
             fprintf(stream, "/%d", tag);
         }
     }
-    if (seq->comment.str) {
+    if (seq->comment.len > 0) {
         fputc(' ', stream);
         fputs(seq->comment.str, stream);
     }
