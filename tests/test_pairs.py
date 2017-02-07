@@ -12,8 +12,7 @@ def setup(config=None):
 
 
 def teardown(config=None):
-    pass
-    #sp.check_call("rm -f _*", shell=True)
+    sp.check_call("rm -f _*", shell=True)
 
 
 def run(*args):
