@@ -64,16 +64,20 @@ ispaired(struct qes_seq *r1, struct qes_seq *r2)
 {
     if (!qes_seq_ok(r1) || !qes_seq_ok(r2)) return false;
     if (r1->name.len == 0 || r2->name.len == 0) return false;
-    if (r1->name.len != r2->name.len) return false;
     for (size_t i = 0; i < r1->name.len; i++) {
         if (r1->name.str[i] != r2->name.str[i]) {
-            if (i == r1->name.len - 2 && r1->name.str[i] == '/') {
+            if (i > 1 && r1->name.str[i-1] == '/' && r2->name.str[i-1] == '/'
+                      && r1->name.str[i] == '1' && r2->name.str[i]=='2') {
+                // Old illumina style:
+                // @HWIblah/1 and @HWIblah/2
                 return true;
             }
             return false;
         }
-        return true;
     }
+    // New illumina style:
+    // @HWIblah 1:blah and @HWIblah 2:blah
+    // Name str stops at first space char. Names identical == pairs
     return true;
 }
 
@@ -228,7 +232,6 @@ pairs_main(int argc, char *argv[])
 
     struct qes_seq *r1 = qes_seq_create();
     struct qes_seq *r2 = qes_seq_create();
-    struct qes_seq *tmpread = NULL;
     struct qes_seqfile *sf1 = qes_seqfile_create(infile1, "r");
     struct qes_seqfile *sf2 = sf1;
     if (infile2 != NULL) {
@@ -244,7 +247,17 @@ pairs_main(int argc, char *argv[])
             res1 = qes_seqfile_read(sf1, r1);
         }
         ssize_t res2 = qes_seqfile_read(sf2, r2);
-        if ((seekpair || res1 < 1) &&  res2 < 1) {
+        if (seekpair && res2 < 1) {
+            qes_seq_print(r1, rsfp, fasta, 0);
+            nsingle++;
+            if (strictpaired) {
+                qes_seq_fill_seq(r1, "N", 1);
+                qes_seq_fill_qual(r1, "I", 1);
+                qes_seq_print(r1, rsfp, fasta, 0);
+            }
+            break;
+        }
+        if (res1 < 1 &&  res2 < 1) {
             break;
         }
         bool r1pass = seekpair || res1 >= min_len;
@@ -270,7 +283,7 @@ pairs_main(int argc, char *argv[])
             }
             if (r2pass) {
                 // Swap so R2 is now R1
-                tmpread = r1;
+                struct qes_seq *tmpread = r1;
                 r1 = r2;
                 r2 = tmpread;
                 seekpair = true;
@@ -290,7 +303,7 @@ pairs_main(int argc, char *argv[])
         if (r1pass && r2pass) {
             qes_seq_print(r1, r1fp, fasta, 1);
             qes_seq_print(r2, r2fp, fasta, 2);
-            npair ++;
+            npair++;
         } else {
             if (strictpaired) {
                 if (!r1pass) {
