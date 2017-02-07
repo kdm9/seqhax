@@ -99,7 +99,7 @@ qes_file_open_ (const char *path, const char *mode, qes_errhandler_func onerr,
     if (qf->buffer == NULL) {
         QES_ZCLOSE(qf->fp);
         qes_free(qf);
-        (*onerr)("Coudn't allocate buffer memory", file, line);
+        (*onerr)("Couldn't allocate buffer memory", file, line);
         return NULL;
     }
     qf->bufiter = qf->buffer;
@@ -328,7 +328,7 @@ qes_file_getuntil_realloc_(struct qes_file *file, int delim, char **bufref,
         /* file->buffer should now be empty, so fill 'er up! */
         ret = __qes_file_fill_buffer(file);
         if (ret == 0) {
-            /* Couln't fill, error out */
+            /* Couldn't fill, error out */
             return -2;
         } else if (ret == EOF) {
             /* EOF time */

@@ -1,20 +1,41 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(libqes C)
 
+if (NOT DEFINED LIBQES_IS_SUBPROJECT)
+  if ("^${CMAKE_SOURCE_DIR}$" STREQUAL "^${PROJECT_SOURCE_DIR}$")
+    set (LIBQES_IS_SUBPROJECT FALSE)
+  else ()
+    set (LIBQES_IS_SUBPROJECT TRUE)
+    message(STATUS "Detected that LIBQES is used a subproject.")
+  endif ()
+endif ()
+
+
 # Append cmake-modules to module path
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
+    "${PROJECT_SOURCE_DIR}/cmake-modules")
 
 
-IF (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/version")
-	FILE(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/version" LIBQES_VERSION)
-ELSE()
-	# git describe as versioning
-	EXECUTE_PROCESS(COMMAND git describe
-			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-			OUTPUT_VARIABLE LIBQES_VERSION
-			OUTPUT_STRIP_TRAILING_WHITESPACE)
+IF (NOT CMAKE_BUILD_TYPE)
+    SET(CMAKE_BUILD_TYPE Release)
 ENDIF()
+
+
+IF (NOT LIBQES_IS_SUBPROJECT)
+    IF (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/version")
+        FILE(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/version" LIBQES_VERSION)
+    ELSE()
+        # git describe as versioning
+        EXECUTE_PROCESS(COMMAND git describe
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                OUTPUT_VARIABLE LIBQES_VERSION
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+    ENDIF()
+    MESSAGE(STATUS "${CMAKE_BUILD_TYPE} build of ${PROJECT_NAME} version: ${LIBQES_VERSION}")
+ELSE()
+    SET(LIBQES_VERSION "")
+ENDIF()
+
 
 #############################
 ## Setup CMAKE Environment ##
@@ -22,10 +43,12 @@ ENDIF()
 
 # Set this before you include libqes as a CMake subproject, so that we know not
 # to add cmake to the install rule
-IF (LIBQES_AS_SUBMODULE)
-    SET(LIBQES_DONT_INSTALL True)
-ELSE()
-    SET(LIBQES_DONT_INSTALL False)
+IF (LIBQES_IS_SUBPROJECT)
+    IF(NOT DEFINED LIBQES_DONT_INSTALL)
+        SET(LIBQES_DONT_INSTALL True)
+    ELSE()
+        SET(LIBQES_DONT_INSTALL False)
+    ENDIF()
 ENDIF()
 
 OPTION(NO_OPENMP "Disable OpenMP" False)
@@ -36,12 +59,6 @@ IF (DEV)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fsanitize=address -fsanitize=leak -fsanitize=undefined")
     SET(CMAKE_BUILD_TYPE Coverage)
 ENDIF()
-
-IF (NOT CMAKE_BUILD_TYPE)
-    SET(CMAKE_BUILD_TYPE Release)
-ENDIF()
-
-MESSAGE(STATUS "${CMAKE_BUILD_TYPE} build of ${PROJECT_NAME} version: ${LIBQES_VERSION}")
 
 # Set output directories
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -66,7 +83,7 @@ INCLUDE(CPack)
 ##########################
 
 
-SET(WARN_FLAGS "${WARN_FLAGS} -Wall -Wextra -Wpedantic")
+SET(WARN_FLAGS "${WARN_FLAGS} -Wall -Wextra -pedantic")
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -D_GNU_SOURCE ${WARN_FLAGS}")
 
@@ -142,6 +159,6 @@ LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/lib)
 
 # Traverse to library source and tests
 ADD_SUBDIRECTORY(src)
-if (NOT LIBQES_AS_SUBMODULE)
+if (NOT LIBQES_IS_SUBPROJECT)
     ADD_SUBDIRECTORY(test)
 endif()
