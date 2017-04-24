@@ -2,7 +2,6 @@
 *                  pairs -- (De)interleave paired end reads                   *
 *******************************************************************************/
 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -12,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <error.h>
 
 #include "qes_seqfile.h"
 
@@ -100,13 +100,14 @@ pairs_main(int argc, char *argv[])
     const char *paironlyfile = NULL;
     const char *statsfile = NULL;
     bool strictpaired = false;
-    char outmode[2] = "x";
+    char outmode[] = "wx";
 
     /* Parse CLI options */
     while ((c = getopt(argc, argv, pairs_optstr)) >= 0) {
         switch (c) {
         case 'f':
             outmode[0] = 'w';
+            outmode[1] = '\0';
             break;
         case 'b':
             strictpaired = false;
@@ -170,7 +171,7 @@ pairs_main(int argc, char *argv[])
         if (ilfp == NULL) {
             fprintf(stderr, "Could not open '%s' for IL output. Perhaps it already exists? (use -f).\n",
                     ilfile);
-            fputc('\n', stderr);
+            fprintf(stderr, "%s\n\n", strerror(errno));
             pairs_usage(stderr);
             return EXIT_FAILURE;
         }
@@ -192,6 +193,7 @@ pairs_main(int argc, char *argv[])
             if (r1fp == NULL) {
                 fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
                         paironlyfile);
+                fprintf(stderr, "%s\n\n", strerror(errno));
             }
             r2fp = r1fp;
         } else {
@@ -200,12 +202,14 @@ pairs_main(int argc, char *argv[])
             if (r1fp == NULL) {
                 fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
                         r1file);
+                fprintf(stderr, "%s\n\n", strerror(errno));
             }
             om = isfilepipe(r2file) ? "w" : outmode;
             r2fp = fopen(r2file, om);
             if (r2fp == NULL) {
                 fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
                         r2file);
+                fprintf(stderr, "%s\n\n", strerror(errno));
             }
         }
         if (rsfile != NULL) {
@@ -214,6 +218,7 @@ pairs_main(int argc, char *argv[])
             if (rsfp == NULL) {
                 fprintf(stderr, "Could not open '%s' for output. Perhaps it already exists? (use -f)\n",
                         rsfile);
+                fprintf(stderr, "%s\n\n", strerror(errno));
             }
         }
         if (r1fp == NULL || r2fp == NULL) {
