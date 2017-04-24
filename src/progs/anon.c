@@ -70,19 +70,22 @@ anon_main(int argc, char *argv[])
     char namebuf[NAMEBUFLEN] = "";
     char commentbuf[] = "";
     while ((res = qes_seqfile_read(sf, seq)) > 0) {
-        int tag = 0;
-        if (hex) {
-            snprintf(namebuf, NAMEBUFLEN, "%zx", ++readno);
+        if (paired) {
+            if (readinpair == 0) {
+                readno++;
+            }
         } else {
-            snprintf(namebuf, NAMEBUFLEN, "%zu", ++readno);
+            readno++;
+        }
+        if (hex) {
+            snprintf(namebuf, NAMEBUFLEN, "%zx", readno);
+        } else {
+            snprintf(namebuf, NAMEBUFLEN, "%zu", readno);
         }
         qes_seq_fill_name(seq, namebuf, NAMEBUFLEN);
         qes_seq_fill_comment(seq, commentbuf, 1);
-        if (paired) {
-            tag = ++readinpair;
-            readinpair = readinpair % 2;
-        }
-        qes_seq_print(seq, stdout, !qes_seq_has_qual(seq), tag);
+        qes_seq_print(seq, stdout, !qes_seq_has_qual(seq), paired ? readinpair + 1 : 0);
+        readinpair = (readinpair + 1) % 2;
     }
 
     qes_seqfile_destroy(sf);
