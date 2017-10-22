@@ -9,6 +9,7 @@ static const char *programs[] = {
     "pairs      -- (De)interleave paired end reads",
     "preapp     -- Prepend or append string to sequences",
     "randseq    -- Generate a random sequence file",
+    "rebarcode  -- Add index sequences from header to the start of reads",
     "stats      -- Basic statistics about sequence files",
     "trunc      -- Truncate sequences",
     NULL
@@ -19,6 +20,7 @@ struct seqhax_prog {
     int (*mainfunc)(int, char **);
 };
 
+extern "C" {
 int anon_main(int argc, char *argv[]);
 int convert_main(int argc, char *argv[]);
 int filter_main(int argc, char *argv[]);
@@ -27,17 +29,20 @@ int preapp_main(int argc, char *argv[]);
 int randseq_main(int argc, char *argv[]);
 int stats_main(int argc, char *argv[]);
 int trunc_main(int argc, char *argv[]);
+}
+int rebarcode_main(int argc, char *argv[]);
 
 static const struct seqhax_prog program_mains[] = {
-    {"anon",    anon_main},
-    {"convert", convert_main},
-    {"filter",  filter_main},
-    {"pairs",   pairs_main},
-    {"preapp",  preapp_main},
-    {"randseq", randseq_main},
-    {"stats",   stats_main},
-    {"trunc",   trunc_main},
-    {NULL,      NULL}
+    {"anon",            anon_main},
+    {"convert",         convert_main},
+    {"filter",          filter_main},
+    {"pairs",           pairs_main},
+    {"preapp",          preapp_main},
+    {"randseq",         randseq_main},
+    {"stats",           stats_main},
+    {"trunc",           trunc_main},
+    {"rebarcode",       rebarcode_main},
+    {NULL,              NULL}
 };
 
 
