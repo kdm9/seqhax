@@ -18,7 +18,7 @@ struct PECheckOptions {
     string outfile;
 };
 
-void helpmsg(void)
+inline void helpmsg(void)
 {
     cerr << "USAGE:" << endl;
     cerr << "    seqhax pecheck [-o OUTPUT] r1 r2" << endl
@@ -46,7 +46,6 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
         }
     }
 
-    // Ensure we have at least two counting hashes to work with
     if (optind + 1 >= argc) {
         helpmsg();
         return EXIT_FAILURE;

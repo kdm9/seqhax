@@ -5,7 +5,6 @@
 #include <regex>
 #include "kmseq.hh"
 
-#include <boost/program_options.hpp>
 
 using namespace std;
 using namespace kmseq;
@@ -37,41 +36,6 @@ bool extract_name_idxseq(const string &header, string &name, vector<string> &idx
 }
 
 
-int parse_args(RebarcodeOptions &opt, int argc, char *argv[])
-{
-    namespace po = boost::program_options;
-    po::options_description flags("Options");
-    flags.add_options()
-        ("help,h",
-            "Print this help")
-        ("outfile,o", po::value<string>(&opt.outfile)->default_value("/dev/stdout"),
-            "Output filename")
-        ("r1", po::value<string>(&opt.r1file)->required(),
-            "First read filename")
-        ("r2", po::value<string>(&opt.r2file)->required(),
-            "Second read filename");
-    po::positional_options_description pos;
-    pos.add("r1", 1);
-    pos.add("r2", 1);
-
-    po::variables_map vm;
-    po::store(po::command_line_parser(argc, argv)
-              .options(flags).positional(pos).run(), vm);
-
-    if (vm.count("help")) {
-        cout << flags << endl;
-        exit(0);
-    }
-    try {
-        po::notify(vm);
-    } catch (po::error &e) {
-        cerr << e.what() << endl << endl;
-        cerr << flags << endl;
-        return 1;
-    }
-    return 0;
-}
-
 void output_rp(ostream &out, const KSeqPair &sp, const string &id1, const string &id2)
 {
     out << "@" << sp.r1.name << endl;
@@ -83,6 +47,45 @@ void output_rp(ostream &out, const KSeqPair &sp, const string &id1, const string
     out << id2 << sp.r2.seq << endl;
     out << "+" << endl;
     out << string(id2.size(), 'I') << sp.r2.qual << endl;
+}
+
+inline void helpmsg(void)
+{
+    cerr << "USAGE:" << endl;
+    cerr << "    seqhax rebarcode [-o OUTPUT] r1 r2" << endl
+         << endl;
+    cerr << "OPTIONS:"<< endl;
+    cerr << "    -o FILE    Output interleaved reads to FILE. Use - for stdout. (default: no output)"<< endl;
+}
+
+int parse_args(RebarcodeOptions &opt, int argc, char *argv[])
+{
+
+    int c;
+    int ret = EXIT_SUCCESS;
+    opt.outfile = "-";
+    while ((c = getopt(argc, argv, "o:")) > 0) {
+        switch (c) {
+            case 'o':
+                opt.outfile = optarg;
+                break;
+            case '?':
+                ret = EXIT_FAILURE;
+            case 'h':
+                helpmsg();
+                return ret;
+        }
+    }
+
+    if (optind + 1 >= argc) {
+        helpmsg();
+        return EXIT_FAILURE;
+    }
+
+    opt.r1file = argv[optind++];
+    opt.r2file = argv[optind++];
+    if (opt.outfile == "-") opt.outfile = "/dev/fd/1";
+    return 0;
 }
 
 int rebarcode_main(int argc, char *argv[])
