@@ -4,6 +4,7 @@
 #include <string>
 
 #include <getopt.h>
+#include <omp.h>
 
 #include "kmseq.hh"
 #include "libseqhax.hh"
@@ -13,9 +14,10 @@ using namespace kmseq;
 using namespace seqhax;
 
 struct PECheckOptions {
-    string r1file;
-    string r2file;
+    vector<string> r1files;
+    vector<string> r2files;
     string outfile;
+    int num_threads;
 };
 
 inline void helpmsg(void)
@@ -32,11 +34,14 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
 
     int c;
     int ret = EXIT_SUCCESS;
-    while ((c = getopt(argc, argv, "o:")) > 0) {
+    while ((c = getopt(argc, argv, "o:t:")) > 0) {
         switch (c) {
             case 'o':
                 opt.outfile = optarg;
                 if (opt.outfile == "-") opt.outfile = "/dev/fd/1";
+                break;
+            case 't':
+                opt.num_threads = atoi(optarg);
                 break;
             case '?':
                 ret = EXIT_FAILURE;
@@ -50,9 +55,14 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
         helpmsg();
         return EXIT_FAILURE;
     }
-
-    opt.r1file = argv[optind++];
-    opt.r2file = argv[optind++];
+    for (; optind + 1 < argc;) {
+        opt.r1files.push_back(argv[optind++]);
+        opt.r2files.push_back(argv[optind++]);
+    }
+    if (opt.r1files.size() > 1 && opt.outfile != "") {
+        cerr << "WARNING: combining multiple pairs of files to a single output. This might be a **very** bad idea." << endl;
+        opt.num_threads = 1;
+    }
     return 0;
 }
 
@@ -65,31 +75,55 @@ int pecheck_main(int argc, char *argv[])
     if (parse_args(opt, argc, argv) != 0) {
         return 1;
     }
-    cerr << "From " << opt.r1file << " and " << opt.r2file << " to " << opt.outfile << endl;
 
     if (opt.outfile != "") {
+        cerr << "Interleaving reads to " << opt.outfile << endl;
         output.open(opt.outfile);
     }
 
-    KSeqPairReader seqs(opt.r1file, opt.r2file);
-    size_t count = 0;
-    for (KSeqPair sp; seqs.next_pair(sp); count++) {
-        string n1, n2;
-        extract_readname(sp.r1.name, n1);
-        extract_readname(sp.r2.name, n2);
-        if (n1 != n2) {
-            cerr << "Pair mismatch! Are you sure these are paired-end reads?" << endl;
-            cerr << endl;
-            cerr << "At pair " << count << endl;
-            cerr << "'" << n1 << "' != '" << n2 << "'" << endl;
-            return 1;
+    cout << "r1_file\tr2_file\tstatus\tread_pairs\n";
+    bool allpass = true;
+    #pragma omp parallel for schedule(dynamic) num_threads(opt.num_threads) shared(allpass)
+    for (size_t i = 0; i < opt.r1files.size(); i++) {
+        KSeqPairReader seqs(opt.r1files[i], opt.r2files[i]);
+        size_t count = 0;
+        bool pass = true;
+        for (KSeqPair sp; seqs.next_pair(sp); count++) {
+            string n1, n2;
+            extract_readname(sp.r1.name, n1);
+            extract_readname(sp.r2.name, n2);
+            if (n1 != n2) {
+                allpass = pass = false;
+                #pragma omp critical
+                {
+                    cerr << "Pair mismatch! Are you sure these are paired-end reads?" << endl;
+                    cerr << endl;
+                    cerr << "At pair " << count << endl;
+                    cerr << "'" << n1 << "' != '" << n2 << "'" << endl;
+                }
+                break;
+            }
+            #pragma omp critical
+            {
+                if (output.is_open()) {
+                    output << sp;
+                }
+            }
         }
-        if (output.is_open()) {
-            output << sp;
+        #pragma omp critical
+        {
+            string status = pass ? "OK" : "FAIL";
+            cout << opt.r1files[i] << "\t" << opt.r2files[i] << "\t"
+                 << status << "\t" << count << endl;
         }
     }
-    cerr << "Processed " << count << " pairs" << endl;
-    return 0;
+    if (allpass) {
+        cerr << "All sets of reads were correctly paired" << endl;
+        return EXIT_SUCCESS;
+    } else {
+        cerr << "Not all reads were correctly paired" << endl;
+        return EXIT_FAILURE;
+    }
 }
 
 #ifdef PECHECK_STANDALONE
