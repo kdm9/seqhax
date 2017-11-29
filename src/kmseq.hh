@@ -12,6 +12,7 @@
 #include <zlib.h>
 #include <string>
 #include <ostream>
+#include <vector>
 #include "kseq.h"
 
 namespace kmseq

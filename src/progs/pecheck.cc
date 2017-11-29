@@ -3,7 +3,7 @@
 #include <iterator>
 #include <string>
 
-#include <boost/program_options.hpp>
+#include <getopt.h>
 
 #include "kmseq.hh"
 #include "libseqhax.hh"
@@ -18,40 +18,42 @@ struct PECheckOptions {
     string outfile;
 };
 
+void helpmsg(void)
+{
+    cerr << "USAGE:" << endl;
+    cerr << "    seqhax pecheck [-o OUTPUT] r1 r2" << endl
+         << endl;
+    cerr << "OPTIONS:"<< endl;
+    cerr << "    -o FILE    Output interleaved reads to FILE. Use - for stdout. (default: no output)"<< endl;
+}
 
 int parse_args(PECheckOptions &opt, int argc, char *argv[])
 {
-    namespace po = boost::program_options;
-    po::options_description flags("Options");
-    flags.add_options()
-        ("help,h",
-            "Print this help")
-        ("outfile,o", po::value<string>(&opt.outfile),
-            "Output filename")
-        ("r1", po::value<string>(&opt.r1file)->required(),
-            "First read filename")
-        ("r2", po::value<string>(&opt.r2file)->required(),
-            "Second read filename");
-    po::positional_options_description pos;
-    pos.add("r1", 1);
-    pos.add("r2", 1);
 
-    po::variables_map vm;
-    po::store(po::command_line_parser(argc, argv)
-              .options(flags).positional(pos).run(), vm);
+    int c;
+    int ret = EXIT_SUCCESS;
+    while ((c = getopt(argc, argv, "o:")) > 0) {
+        switch (c) {
+            case 'o':
+                opt.outfile = optarg;
+                if (opt.outfile == "-") opt.outfile = "/dev/fd/1";
+                break;
+            case '?':
+                ret = EXIT_FAILURE;
+            case 'h':
+                helpmsg();
+                return ret;
+        }
+    }
 
-    if (vm.count("help")) {
-        cout << flags << endl;
-        exit(0);
+    // Ensure we have at least two counting hashes to work with
+    if (optind + 1 >= argc) {
+        helpmsg();
+        return EXIT_FAILURE;
     }
-    try {
-        po::notify(vm);
-    } catch (po::error &e) {
-        cerr << e.what() << endl << endl;
-        cerr << flags << endl;
-        return 1;
-    }
-    if (opt.outfile == "-") opt.outfile = "/dev/fd/1";
+
+    opt.r1file = argv[optind++];
+    opt.r2file = argv[optind++];
     return 0;
 }
 
