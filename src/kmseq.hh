@@ -11,6 +11,7 @@
 
 #include <zlib.h>
 #include <string>
+#include <ostream>
 #include "kseq.h"
 
 namespace kmseq
@@ -128,7 +129,25 @@ protected:
     bool _interleaved;
 };
 
+
 } /* end namespace kmseq */
+
+inline std::ostream &operator<<(std::ostream &out, const kmseq::KSeq &r)
+{ 
+    using std::endl;
+    out << "@" << r.name << endl;
+    out << r.seq << endl;
+    out << "+" << endl;
+    out << r.qual << endl;
+    return out;
+}
+
+inline std::ostream &operator<<(std::ostream &out, const kmseq::KSeqPair &rp)
+{ 
+    out << rp.r1;
+    out << rp.r2;
+    return out;
+}
 
 #endif /* end of include guard: KMSEQ_HH_T0ZK1CKV */
 

@@ -7,6 +7,7 @@ static const char *programs[] = {
     "convert    -- Convert between FASTA and FASTQ formats",
     "filter     -- Filter reads from a sequence file",
     "pairs      -- (De)interleave paired end reads",
+    "pecheck    -- Check that paired end reads match properly",
     "preapp     -- Prepend or append string to sequences",
     "randseq    -- Generate a random sequence file",
     "rebarcode  -- Add index sequences from header to the start of reads",
@@ -30,7 +31,10 @@ int randseq_main(int argc, char *argv[]);
 int stats_main(int argc, char *argv[]);
 int trunc_main(int argc, char *argv[]);
 }
+
 int rebarcode_main(int argc, char *argv[]);
+int pecheck_main(int argc, char *argv[]);
+
 
 static const struct seqhax_prog program_mains[] = {
     {"anon",            anon_main},
@@ -42,6 +46,7 @@ static const struct seqhax_prog program_mains[] = {
     {"stats",           stats_main},
     {"trunc",           trunc_main},
     {"rebarcode",       rebarcode_main},
+    {"pecheck",         pecheck_main},
     {NULL,              NULL}
 };
 
