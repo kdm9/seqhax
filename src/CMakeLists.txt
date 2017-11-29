@@ -3,7 +3,6 @@ ADD_SUBDIRECTORY(ext/libqes)
 
 file(GLOB CMD_SOURCES progs/*.c progs/*.cc)
 
-message(STATUS ${CMD_SOURCES})
 INCLUDE_DIRECTORIES(ext)
 
 # Targets
