@@ -17,6 +17,7 @@ struct PECheckOptions {
     vector<string> r1files;
     vector<string> r2files;
     string outfile;
+    bool print_table;
     int num_threads;
 };
 
@@ -34,11 +35,16 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
 
     int c;
     int ret = EXIT_SUCCESS;
+    opt.print_table = true;
+    opt.num_threads = 1;
     while ((c = getopt(argc, argv, "o:t:")) > 0) {
         switch (c) {
             case 'o':
                 opt.outfile = optarg;
-                if (opt.outfile == "-") opt.outfile = "/dev/fd/1";
+                if (opt.outfile == "-") {
+                    opt.outfile = "/dev/fd/1";
+                    opt.print_table = false;
+                }
                 break;
             case 't':
                 opt.num_threads = atoi(optarg);
@@ -79,9 +85,12 @@ int pecheck_main(int argc, char *argv[])
     if (opt.outfile != "") {
         cerr << "Interleaving reads to " << opt.outfile << endl;
         output.open(opt.outfile);
+        opt.num_threads = 1;
     }
 
-    cout << "r1_file\tr2_file\tstatus\tread_pairs\n";
+    if (opt.print_table) {
+        cout << "r1_file\tr2_file\tstatus\tread_pairs\n";
+    }
     bool allpass = true;
     #pragma omp parallel for schedule(dynamic) num_threads(opt.num_threads) shared(allpass)
     for (size_t i = 0; i < opt.r1files.size(); i++) {
@@ -103,18 +112,18 @@ int pecheck_main(int argc, char *argv[])
                 }
                 break;
             }
-            #pragma omp critical
-            {
-                if (output.is_open()) {
-                    output << sp;
-                }
+            if (output.is_open()) {
+                // This won't need a critical section, as we disable multi-threading when printing reads.
+                output << sp;
             }
         }
-        #pragma omp critical
-        {
-            string status = pass ? "OK" : "FAIL";
-            cout << opt.r1files[i] << "\t" << opt.r2files[i] << "\t"
-                 << status << "\t" << count << endl;
+        if (opt.print_table) {
+            #pragma omp critical
+            {
+                string status = pass ? "OK" : "FAIL";
+                cout << opt.r1files[i] << "\t" << opt.r2files[i] << "\t"
+                     << status << "\t" << count << endl;
+            }
         }
     }
     if (allpass) {
