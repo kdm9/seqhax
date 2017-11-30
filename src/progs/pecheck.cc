@@ -24,10 +24,13 @@ struct PECheckOptions {
 inline void helpmsg(void)
 {
     cerr << "USAGE:" << endl;
-    cerr << "    seqhax pecheck [-o OUTPUT] r1 r2" << endl
+    cerr << "    seqhax pecheck [OPTIONS] r1 r2 [r1 r2 ...]" << endl
          << endl;
     cerr << "OPTIONS:"<< endl;
-    cerr << "    -o FILE    Output interleaved reads to FILE. Use - for stdout. (default: no output)"<< endl;
+    cerr << "    -o FILE        Output interleaved reads to FILE. Use - for stdout." << endl
+         << "                   All sets of paired end files will end up in same" << endl
+         << "                   output!!! (default: no output)"<< endl;
+    cerr << "    -t THREADS     Number of parallel threads (default: no output)"<< endl;
 }
 
 int parse_args(PECheckOptions &opt, int argc, char *argv[])
