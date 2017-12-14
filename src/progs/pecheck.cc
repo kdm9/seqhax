@@ -14,23 +14,26 @@ using namespace kmseq;
 using namespace seqhax;
 
 struct PECheckOptions {
-    vector<string> r1files;
-    vector<string> r2files;
+    vector<string> inputfiles;
     string outfile;
     bool print_table;
     int num_threads;
+    bool interleaved;
 };
 
 inline void helpmsg(void)
 {
-    cerr << "USAGE:" << endl;
-    cerr << "    seqhax pecheck [OPTIONS] r1 r2 [r1 r2 ...]" << endl
-         << endl;
-    cerr << "OPTIONS:"<< endl;
-    cerr << "    -o FILE        Output interleaved reads to FILE. Use - for stdout." << endl
+    cerr << "USAGE:" << endl
+         << "    seqhax pecheck [OPTIONS] r1fq r2fq [r1fq r2fq ...]" << endl
+         << "    seqhax pecheck [OPTIONS] -i ilfq [ilfq ilfq ...]" << endl
+         << endl
+         << "OPTIONS:"<< endl
+         << "    -o FILE        Output interleaved reads to FILE. Use - for stdout." << endl
          << "                   All sets of paired end files will end up in same" << endl
-         << "                   output!!! (default: no output)"<< endl;
-    cerr << "    -t THREADS     Number of parallel threads (default: no output)"<< endl;
+         << "                   output!!! (default: no output)" << endl
+         << "    -i             Interleaved inputs" << endl
+         << "    -q             Don't print tabular summary" << endl
+         << "    -t THREADS     Number of parallel threads (default: no output)"<< endl;
 }
 
 int parse_args(PECheckOptions &opt, int argc, char *argv[])
@@ -40,7 +43,8 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
     int ret = EXIT_SUCCESS;
     opt.print_table = true;
     opt.num_threads = 1;
-    while ((c = getopt(argc, argv, "o:t:")) > 0) {
+    opt.interleaved = false;
+    while ((c = getopt(argc, argv, "o:t:i")) > 0) {
         switch (c) {
             case 'o':
                 opt.outfile = optarg;
@@ -51,6 +55,12 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
                 break;
             case 't':
                 opt.num_threads = atoi(optarg);
+                break;
+            case 'i':
+                opt.interleaved = true;
+                break;
+            case 'q':
+                opt.print_table = false;
                 break;
             case '?':
                 ret = EXIT_FAILURE;
@@ -65,10 +75,9 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
         return EXIT_FAILURE;
     }
     for (; optind + 1 < argc;) {
-        opt.r1files.push_back(argv[optind++]);
-        opt.r2files.push_back(argv[optind++]);
+        opt.inputfiles.push_back(argv[optind++]);
     }
-    if (opt.r1files.size() > 1 && opt.outfile != "") {
+    if (opt.inputfiles.size() > 1 && opt.outfile != "") {
         cerr << "WARNING: combining multiple pairs of files to a single output. This might be a **very** bad idea." << endl;
         opt.num_threads = 1;
     }
@@ -96,15 +105,27 @@ int pecheck_main(int argc, char *argv[])
     }
     bool allpass = true;
     #pragma omp parallel for schedule(dynamic) num_threads(opt.num_threads) shared(allpass)
-    for (size_t i = 0; i < opt.r1files.size(); i++) {
-        KSeqPairReader seqs(opt.r1files[i], opt.r2files[i]);
+    for (size_t i = 0; i < opt.inputfiles.size(); i++) {
+        KSeqPairReader seqs;
+        try {
+            if (opt.interleaved) {
+                seqs.open(opt.inputfiles[i]);
+            } else {
+                seqs.open(opt.inputfiles[i], opt.inputfiles[i+1]); i++;
+            }
+        } catch (exception &exc) {
+            cerr << exc.what() << endl;
+            break;
+        }
+                
         size_t count = 0;
         bool pass = true;
         for (KSeqPair sp; seqs.next_pair(sp); count++) {
             string n1, n2;
-            extract_readname(sp.r1.name, n1);
-            extract_readname(sp.r2.name, n2);
-            if (n1 != n2) {
+            int mate1, mate2;
+            extract_readname(sp.r1.name, n1, mate1);
+            extract_readname(sp.r2.name, n2, mate2);
+            if (n1 != n2 || mate1 != 1 || mate2 != 2) {
                 allpass = pass = false;
                 #pragma omp critical
                 {
@@ -112,6 +133,7 @@ int pecheck_main(int argc, char *argv[])
                     cerr << endl;
                     cerr << "At pair " << count << endl;
                     cerr << "'" << n1 << "' != '" << n2 << "'" << endl;
+                    cerr << mate1 << " != " << mate2 << endl;
                 }
                 break;
             }
@@ -124,7 +146,7 @@ int pecheck_main(int argc, char *argv[])
             #pragma omp critical
             {
                 string status = pass ? "OK" : "FAIL";
-                cout << opt.r1files[i] << "\t" << opt.r2files[i] << "\t"
+                cout << opt.inputfiles[i-2] << "\t" << opt.inputfiles[i-1] << "\t"
                      << status << "\t" << count << endl;
             }
         }
