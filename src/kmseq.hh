@@ -13,6 +13,7 @@
 #include <string>
 #include <ostream>
 #include <vector>
+#include <stdexcept>
 #include "kseq.h"
 
 namespace kmseq
@@ -33,7 +34,11 @@ struct KSeq
 class KSeqReader
 {
 public:
-    KSeqReader();
+    KSeqReader()
+        : _fp(nullptr)
+        , _seq(nullptr)
+    {
+    }
     KSeqReader(const string &filename)
     {
         this->open(filename);
@@ -49,13 +54,14 @@ public:
     {
         _fp = gzopen(filename.c_str(), "r");
         if (_fp == NULL) {
-            throw "Could not open file";
+            throw runtime_error(string("Could not open file: ") + filename);
         }
         _seq = kseq_init(_fp);
     }
 
     bool next_read(KSeq &ks)
     {
+        if (_seq == nullptr) return false;
         int l = kseq_read(_seq);
         if (l < 1) return false;
         ks.name.assign(_seq->name.s, _seq->name.l);
@@ -91,16 +97,34 @@ struct KSeqPair
 class KSeqPairReader
 {
 public:
-    KSeqPairReader(const string &r1file, const string &r2file)
-        : _r1(r1file)
-        , _r2(r2file)
-        , _interleaved(false)
-    {}
-    KSeqPairReader(const string &interleavedfile)
-        : _r1(interleavedfile)
+    KSeqPairReader()
+        : _r1()
         , _r2()
-        , _interleaved(true)
-    {}
+        , _interleaved(false)
+    {
+    }
+    KSeqPairReader(const string &r1file, const string &r2file)
+    {
+        this->open(r1file, r2file);
+    }
+
+    KSeqPairReader(const string &interleavedfile)
+    {
+        this->open(interleavedfile);
+    }
+
+    void open(const string &r1file, const string &r2file)
+    {
+        _r1.open(r1file);
+        _r2.open(r2file);
+        _interleaved = false;
+    }
+
+    void open(const string &interleavedfile)
+    {
+        _r1.open(interleavedfile);
+        _interleaved = true;
+    }
 
     bool next_pair(KSeqPair &ks)
     {
