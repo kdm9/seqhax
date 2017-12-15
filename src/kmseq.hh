@@ -13,6 +13,7 @@
 #include <string>
 #include <ostream>
 #include <vector>
+#include <stdexcept>
 #include "kseq.h"
 
 namespace kmseq
@@ -97,6 +98,9 @@ class KSeqPairReader
 {
 public:
     KSeqPairReader()
+        : _r1()
+        , _r2()
+        , _interleaved(false)
     {
     }
     KSeqPairReader(const string &r1file, const string &r2file)

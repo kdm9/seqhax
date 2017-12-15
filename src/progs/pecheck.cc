@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iterator>
 #include <string>
+#include <atomic>
 
 #include <getopt.h>
 #include <omp.h>
@@ -44,7 +45,7 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
     opt.print_table = true;
     opt.num_threads = 1;
     opt.interleaved = false;
-    while ((c = getopt(argc, argv, "o:t:i")) > 0) {
+    while ((c = getopt(argc, argv, "o:t:iq")) > 0) {
         switch (c) {
             case 'o':
                 opt.outfile = optarg;
@@ -70,15 +71,20 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
         }
     }
 
-    if (optind + 1 >= argc) {
+    const int remaining = argc - optind;
+    if (    (opt.interleaved && remaining < 1) ||
+            (!opt.interleaved && (remaining < 2 || remaining % 2 != 0))) {
         helpmsg();
         return EXIT_FAILURE;
     }
-    for (; optind + 1 < argc;) {
-        opt.inputfiles.push_back(argv[optind++]);
+
+    for (; optind < argc; optind++) {
+        opt.inputfiles.push_back(argv[optind]);
     }
-    if (opt.inputfiles.size() > 1 && opt.outfile != "") {
-        cerr << "WARNING: combining multiple pairs of files to a single output. This might be a **very** bad idea." << endl;
+
+    const size_t onesamp = opt.interleaved ? 1 : 2;
+    if (opt.inputfiles.size() > onesamp && opt.outfile != "") {
+        cerr << "WARNING: combining multiple files to a single output. This might be a **very** bad idea." << endl;
         opt.num_threads = 1;
     }
     return 0;
@@ -101,26 +107,29 @@ int pecheck_main(int argc, char *argv[])
     }
 
     if (opt.print_table) {
-        cout << "r1_file\tr2_file\tstatus\tread_pairs\n";
+        if (opt.interleaved) {
+            cout << "il_file\tstatus\tread_pairs\n";
+        } else {
+            cout << "r1_file\tr2_file\tstatus\tread_pairs\n";
+        }
     }
-    bool allpass = true;
+    atomic<bool> allpass(true);
     #pragma omp parallel for schedule(dynamic) num_threads(opt.num_threads) shared(allpass)
-    for (size_t i = 0; i < opt.inputfiles.size(); i++) {
+    for (size_t i = 0; i < opt.inputfiles.size(); i += opt.interleaved ? 1 : 2) {
+        volatile bool pass = true;
         KSeqPairReader seqs;
         try {
             if (opt.interleaved) {
                 seqs.open(opt.inputfiles[i]);
             } else {
-                seqs.open(opt.inputfiles[i], opt.inputfiles[i+1]); i++;
+                seqs.open(opt.inputfiles[i], opt.inputfiles[i+1]);
             }
         } catch (exception &exc) {
             cerr << exc.what() << endl;
-            break;
+            allpass = pass = false;
         }
-                
         size_t count = 0;
-        bool pass = true;
-        for (KSeqPair sp; seqs.next_pair(sp); count++) {
+        for (KSeqPair sp; seqs.next_pair(sp) && pass; count++) {
             string n1, n2;
             int mate1, mate2;
             extract_readname(sp.r1.name, n1, mate1);
@@ -131,9 +140,8 @@ int pecheck_main(int argc, char *argv[])
                 {
                     cerr << "Pair mismatch! Are you sure these are paired-end reads?" << endl;
                     cerr << endl;
-                    cerr << "At pair " << count << endl;
-                    cerr << "'" << n1 << "' != '" << n2 << "'" << endl;
-                    cerr << mate1 << " != " << mate2 << endl;
+                    cerr << "    At pair " << count << endl;
+                    cerr << "    '" << n1 << "' != '" << n2 << "', " << mate1 << " != " << mate2 << endl;
                 }
                 break;
             }
@@ -146,8 +154,12 @@ int pecheck_main(int argc, char *argv[])
             #pragma omp critical
             {
                 string status = pass ? "OK" : "FAIL";
-                cout << opt.inputfiles[i-2] << "\t" << opt.inputfiles[i-1] << "\t"
-                     << status << "\t" << count << endl;
+                if (opt.interleaved) {
+                    cout << opt.inputfiles[i] << "\t" << status << "\t" << count << endl;
+                } else {
+                    cout << opt.inputfiles[i] << "\t" << opt.inputfiles[i+1] << "\t"
+                         << status << "\t" << count << endl;
+                }
             }
         }
     }
