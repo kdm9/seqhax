@@ -40,6 +40,7 @@ where PROGRAM is one of:
     convert    -- Convert between FASTA and FASTQ formats
     filter     -- Filter reads from a sequence file
     pairs      -- (De)interleave paired end reads
+    pecheck    -- Check that paired end reads match properly (also join them)
     preapp     -- Prepend or append string to sequences
     randseq    -- Generate a random sequence file
     stats      -- Basic statistics about sequence files
@@ -47,7 +48,7 @@ where PROGRAM is one of:
 ```
 
 The usage of each subcommand can be obtained using the `-h` flag to that
-subcommand, e.g. `seqhax seq -h`.
+subcommand, e.g. `seqhax preapp -h`.
 
 
 ## Sub-commands
@@ -82,6 +83,11 @@ forms:
 * "Broken paired" interleaved files, where failed/missing reads are simply not
   present.
 
+#### `pecheck`
+
+Checks that read pairs are correctly matched, between split (R1 & R2) files, or
+interleaved files. Optionally, can be used to join multiple R1/R2 from the
+sample sample into a single interleaved file, while checking read IDs match.
 
 #### `preapp`
 
