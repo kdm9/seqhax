@@ -112,6 +112,7 @@ pairs_main(int argc, char *argv[])
         case 'b':
             strictpaired = false;
             ilfile = optarg;
+            min_len = 2; // By default, remove the reads with 1 N as their sequence
             break;
         case 's':
             strictpaired = true;
