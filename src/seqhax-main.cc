@@ -5,6 +5,7 @@
 static const char *programs[] = {
     "anon       -- Rename sequences by a sequential number",
     "convert    -- Convert between FASTA and FASTQ formats",
+    "clihist    -- Records a histogram of stdin.",
     "filter     -- Filter reads from a sequence file",
     "pairs      -- (De)interleave paired end reads",
     "pecheck    -- Check that paired end reads match properly",
@@ -34,6 +35,7 @@ int trunc_main(int argc, char *argv[]);
 
 int rebarcode_main(int argc, char *argv[]);
 int pecheck_main(int argc, char *argv[]);
+int clihist_main(int argc, char *argv[]);
 
 
 static const struct seqhax_prog program_mains[] = {
@@ -47,6 +49,7 @@ static const struct seqhax_prog program_mains[] = {
     {"trunc",           trunc_main},
     {"rebarcode",       rebarcode_main},
     {"pecheck",         pecheck_main},
+    {"clihist",         clihist_main},
     {NULL,              NULL}
 };
 
