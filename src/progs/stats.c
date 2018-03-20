@@ -56,7 +56,7 @@ stats_main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    puts("filename\treads\tbases\tperc_gc\tnon_acgt");
+    puts("filename\treads\tbases\tgc_bases\tnon_acgt_bases");
     #pragma omp parallel for num_threads(n_threads) schedule(dynamic)
     for (int file = optind; file < argc; file++) {
         const char *filename = argv[file];
@@ -72,18 +72,17 @@ stats_main(int argc, char *argv[])
                 comp[seq->seq.str[i] & 0xdf] += 1;
             }
         }
-        ssize_t at = comp['A'] + comp['T'];
-        ssize_t gc = comp['C'] + comp['G'];
-        ssize_t acgt = at + gc;
-        ssize_t non_acgt = n_bp - acgt;
-        float prop_gc = (float) gc / (float) acgt;
+        size_t at = comp['A'] + comp['T'];
+        size_t gc = comp['C'] + comp['G'];
+        size_t acgt = at + gc;
+        size_t non_acgt = n_bp - acgt;
         #pragma omp critical
         {
             if (n_reads == 0) {
                 fprintf(stderr, "WARNING: Invalid or empty file '%s'\n", filename);
             }
-            printf("%s\t%zu\t%zu\t%0.1f\t%zu\n", filename, n_reads, n_bp,
-                        prop_gc * 100, non_acgt);
+            printf("%s\t%zu\t%zu\t%zu\t%zu\n", filename, n_reads, n_bp,
+                        gc, non_acgt);
             fflush(stdout);
         }
         qes_seqfile_destroy(sf);
