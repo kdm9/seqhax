@@ -26,6 +26,8 @@ void extract_readname(const string &header, string &name, int &mate)
         i -= 2;
     } else if ((header[i+1] == '1' || header[i+1] == '2') && header[i+2] == ':') {
         mate = header[i+1] - '0'; // extract mate id
+    } else {
+        mate = 0;
     }
     name = header.substr(0, i);
 }

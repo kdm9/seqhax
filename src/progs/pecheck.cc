@@ -134,14 +134,14 @@ int pecheck_main(int argc, char *argv[])
             int mate1, mate2;
             extract_readname(sp.r1.name, n1, mate1);
             extract_readname(sp.r2.name, n2, mate2);
-            if (n1 != n2 || mate1 != 1 || mate2 != 2) {
+            if (n1 != n2 || ((mate1 != 0 && mate2 != 0) && (mate1 != 1 || mate2 != 2))) {
                 allpass = pass = false;
                 #pragma omp critical
                 {
                     cerr << "Pair mismatch! Are you sure these are paired-end reads?" << endl;
                     cerr << endl;
                     cerr << "    At pair " << count << endl;
-                    cerr << "    '" << n1 << "' != '" << n2 << "', " << mate1 << " != " << mate2 << endl;
+                    cerr << "    '" << n1 << "' != '" << n2 << "', mates are (" << mate1 << ", " << mate2 << ")" << endl;
                 }
                 break;
             }
