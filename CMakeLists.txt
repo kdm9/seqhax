@@ -104,3 +104,4 @@ include_directories(${CMAKE_SOURCE_DIR}/src
 link_directories(${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(src)
+ADD_TEST(NAME "CLITests" COMMAND bash -c "export PATH=${CMAKE_BINARY_DIR}/bin:$PATH ; bash ${CMAKE_SOURCE_DIR}/tests/test.sh")
