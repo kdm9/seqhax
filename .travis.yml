@@ -26,4 +26,4 @@ script:
  - make
  - make install
  - test -f ../target/bin/seqhax
- - export PATH=$PATH:$(readlink -f ../target/bin); bash tests/test.sh
+ - cd .. && export PATH=$PATH:$(readlink -f ../target/bin); bash tests/test.sh
