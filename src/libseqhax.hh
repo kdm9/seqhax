@@ -1,8 +1,6 @@
 #ifndef LIBSEQHAX_HH_KWLGOZPY
 #define LIBSEQHAX_HH_KWLGOZPY
 
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include "kmseq.hh"
 
 namespace seqhax
