@@ -1,0 +1,29 @@
+language: cpp
+
+sudo: required
+dist: trusty
+
+env:
+  - BUILD_TYPE=Release
+  - BUILD_TYPE=Debug
+
+compiler:
+  - clang
+  - gcc
+
+notifications:
+  email:
+    - foss@kdmurray.id.au
+
+install:
+ - sudo apt-get install zlib1g-dev libbzip2-dev
+ - mkdir build
+ - mkdir target
+
+script:
+ - cd build
+ - cmake .. -DCMAKE_INSTALL_PREFIX=../target -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+ - make
+ - ctest --verbose
+ - make install
+ - test -f ../target/bin/seqhax
