@@ -66,7 +66,7 @@ public:
         if (l < 1) return false;
         ks.name.assign(_seq->name.s, _seq->name.l);
         ks.seq.assign(_seq->seq.s, _seq->seq.l);
-        ks.qual.assign(_seq->seq.s, _seq->seq.l);
+        ks.qual.assign(_seq->qual.s, _seq->qual.l);
         return true;
     }
 
