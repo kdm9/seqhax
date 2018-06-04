@@ -77,7 +77,7 @@ public:
             if (count >= sequences.size()) {
                 sequences.emplace_back();
             }
-            if (!this->next_read(sequences.back())) break;
+            if (!this->next_read(sequences[count])) break;
         }
         sequences.resize(count);
         return count;
@@ -168,11 +168,12 @@ inline std::ostream &operator<<(std::ostream &out, const kmseq::KSeq &r)
 }
 
 inline std::ostream &operator<<(std::ostream &out, const kmseq::KSeqPair &rp)
-{ 
+{
     out << rp.r1;
     out << rp.r2;
     return out;
 }
+
 
 #endif /* end of include guard: KMSEQ_HH_T0ZK1CKV */
 
