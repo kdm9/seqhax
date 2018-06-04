@@ -1,7 +1,9 @@
 #include "kmseq.hh"
+#include <vector>
 #include <iostream>
 using namespace std;
 using namespace kmseq;
+
 
 int cat_main(int argc, char *argv[])
 {
@@ -11,9 +13,11 @@ int cat_main(int argc, char *argv[])
     }
     for (int i = 1; i < argc; i++) {
         KSeqReader seqs(argv[i]);
-        size_t count = 0;
-        for (KSeq s; seqs.next_read(s); count++) {
-            cout << s;
+        vector<KSeq> sv;
+        while (seqs.next_chunk(sv, 1000) > 0) {
+            for (const auto &s: sv) {
+                cout << s;
+            }
         }
     }
     return 0;
