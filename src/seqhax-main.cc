@@ -30,14 +30,14 @@ int filter_main(int argc, char *argv[]);
 int pairs_main(int argc, char *argv[]);
 int preapp_main(int argc, char *argv[]);
 int randseq_main(int argc, char *argv[]);
-int stats_main(int argc, char *argv[]);
 int trunc_main(int argc, char *argv[]);
 }
 
 int cat_main(int argc, char *argv[]);
-int rebarcode_main(int argc, char *argv[]);
-int pecheck_main(int argc, char *argv[]);
 int clihist_main(int argc, char *argv[]);
+int pecheck_main(int argc, char *argv[]);
+int rebarcode_main(int argc, char *argv[]);
+int stats_main(int argc, char *argv[]);
 
 
 static const struct seqhax_prog program_mains[] = {
