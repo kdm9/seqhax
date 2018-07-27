@@ -129,26 +129,23 @@ int pecheck_main(int argc, char *argv[])
             allpass = pass = false;
         }
         size_t count = 0;
-        for (KSeqPair sp; seqs.next_pair(sp) && pass; count++) {
-            string n1, n2;
-            int mate1, mate2;
-            extract_readname(sp.r1.name, n1, mate1);
-            extract_readname(sp.r2.name, n2, mate2);
-            if (n1 != n2 || ((mate1 != 0 && mate2 != 0) && (mate1 != 1 || mate2 != 2))) {
-                allpass = pass = false;
-                #pragma omp critical
-                {
-                    cerr << "Pair mismatch! Are you sure these are paired-end reads?" << endl;
-                    cerr << endl;
-                    cerr << "    At pair " << count << endl;
-                    cerr << "    '" << n1 << "' != '" << n2 << "', mates are (" << mate1 << ", " << mate2 << ")" << endl;
+        try {
+            for (KSeqPair sp; seqs.next_pair(sp); count++) {
+                string n1, n2;
+                int mate1, mate2;
+                extract_readname(sp.r1.name, n1, mate1);
+                extract_readname(sp.r2.name, n2, mate2);
+                if (n1 != n2 || ((mate1 != 0 && mate2 != 0) && (mate1 != 1 || mate2 != 2))) {
+                    throw runtime_error("Pair mismatch! Are you sure these are paired-end reads?");
                 }
-                break;
+                if (output.is_open()) {
+                    // This won't need a critical section, as we disable multi-threading when printing reads.
+                    output << sp;
+                }
             }
-            if (output.is_open()) {
-                // This won't need a critical section, as we disable multi-threading when printing reads.
-                output << sp;
-            }
+        } catch (exception &e) {
+            allpass = pass = false;
+            cerr << "ERROR in '" << opt.inputfiles[i] << "': " << e.what() << endl;
         }
         if (opt.print_table) {
             #pragma omp critical
