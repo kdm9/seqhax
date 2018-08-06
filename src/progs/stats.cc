@@ -24,7 +24,7 @@ stats_usage(FILE *stream)
     fprintf(stream, "\n");
     fprintf(stream, "OPTIONS:\n");
     fprintf(stream, "    -t THREADS  Number of parallel jobs [1]\n");
-    fprintf(stream, "\nFILEs must be FASTQs, optionally gzip-compressed");
+    fprintf(stream, "\nFILEs must be FASTQs, optionally gzip-compressed\n");
 }
 static const char *stats_optstr = "t:";
 
