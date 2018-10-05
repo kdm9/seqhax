@@ -41,7 +41,7 @@ def main(indirs, outdir, dryrun=True, jobs=1, force=False, gzip="gzip"):
             ifnotexist = ""
         else:
             ifnotexist = f"test -f '{out}' || "
-        cmd = f"{ifnotexist} seqhax pecheck -o >({gzip} >'{tmpout}') '{fqs}' >'{out}.tsv' && mv '{tmpout}' '{out}'"
+        cmd = f"{ifnotexist} ( seqhax pecheck -o >( {gzip} > '{tmpout}' ) '{fqs}' >'{out}.tsv' && mv '{tmpout}' '{out}' )"
         todo.append(cmd)
 
     if dryrun:
@@ -50,7 +50,7 @@ def main(indirs, outdir, dryrun=True, jobs=1, force=False, gzip="gzip"):
     pool = mp.Pool(jobs)
     res = pool.imap(run, todo)
     for r in res:
-        if r is not None:
+        if isinstance(r, sp.CalledProcessError):
             pool.terminate()
             raise r
 
@@ -59,7 +59,7 @@ if __name__ == "__main__":
     a = ap.ArgumentParser("pecheck-wrapper.py")
     a.add_argument("--gzip", type=str, default="gzip",
                    help="Which command should be used to gzip? (try pigz!)")
-    a.add_argument("-j", "--jobs", nargs=1, default=1, type=int,
+    a.add_argument("-j", "--jobs", default=1, type=int,
                    help="number of parallel jobs")
     a.add_argument("-f", "--force", action="store_true",
                    help="Force creation of merged outputs even if they exist")
