@@ -26,7 +26,7 @@ def main(indirs, outdir, dryrun=True, jobs=1, force=False, gzip="gzip"):
     matching_fastqs = defaultdict(list)
     for indir in indirs:
         for fastq in find_fastqs(indir):
-            sans_r12 = re.sub("_R[12]_", "_", fastq)
+            sans_r12 = re.sub("_R[12]", "", fastq)
             matching_fastqs[sans_r12].append(fastq)
 
     todo = []
@@ -41,7 +41,7 @@ def main(indirs, outdir, dryrun=True, jobs=1, force=False, gzip="gzip"):
             ifnotexist = ""
         else:
             ifnotexist = f"test -f '{out}' || "
-        cmd = f"{ifnotexist} ( seqhax pecheck -o >( {gzip} > '{tmpout}' ) '{fqs}' >'{out}.tsv' && mv '{tmpout}' '{out}' )"
+        cmd = f"({ifnotexist} ( seqhax pecheck -o >( {gzip} > '{tmpout}' ) '{fqs}' >'{out}.tsv' && mv '{tmpout}' '{out}' )) 2>{out}.log"
         todo.append(cmd)
 
     if dryrun:
