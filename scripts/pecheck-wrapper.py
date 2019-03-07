@@ -17,14 +17,14 @@ def run(cmd):
 
 def main(inputs, outdir, dryrun=True, jobs=1, force=False, gzip="gzip", fastqpattern='*.fastq.gz'):
     if not op.exists(outdir) and not dryrun:
-        os.makedir(outdir)
+        os.makedirs(outdir)
 
     fastqs = []
     for fileordir in inputs:
         if op.isfile(fileordir) and fnmatch.fnmatch(fileordir, fastqpattern):
             fastqs.append(fileordir)
         else:
-            for root, dirs, files in os.walk(dir):
+            for root, dirs, files in os.walk(fileordir):
                 for file in fnmatch.filter(files, fastqpattern):
                     fastqs.append(op.join(root, file))
 
