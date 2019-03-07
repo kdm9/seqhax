@@ -7,30 +7,37 @@ from os import path as op
 import os
 import re
 import multiprocessing as mp
+from sys import stdout, stderr
 
-
-def find_fastqs(dir):
-    for root, dirs, files in os.walk(dir):
-        for file in fnmatch.filter(files, "*.fastq.gz"):
-            yield op.join(root, file)
 
 def run(cmd):
     print(cmd)
     return sp.check_call(cmd, shell=True, executable="/bin/bash"),
 
 
-def main(indirs, outdir, dryrun=True, jobs=1, force=False, gzip="gzip"):
+def main(inputs, outdir, dryrun=True, jobs=1, force=False, gzip="gzip", fastqpattern='*.fastq.gz'):
     if not op.exists(outdir) and not dryrun:
         os.makedir(outdir)
 
+    fastqs = []
+    for fileordir in inputs:
+        if op.isfile(fileordir) and fnmatch.fnmatch(fileordir, fastqpattern):
+            fastqs.append(fileordir)
+        else:
+            for root, dirs, files in os.walk(dir):
+                for file in fnmatch.filter(files, fastqpattern):
+                    fastqs.append(op.join(root, file))
+
     matching_fastqs = defaultdict(list)
-    for indir in indirs:
-        for fastq in find_fastqs(indir):
-            sans_r12 = re.sub("_R[12]", "", fastq)
-            matching_fastqs[sans_r12].append(fastq)
+    for fastq in fastqs:
+        sans_r12 = re.sub("_R[12]", "", fastq)
+        matching_fastqs[sans_r12].append(fastq)
 
     todo = []
     for group, members in matching_fastqs.items():
+        if len(members) != 2:
+            print("ERROR: group of matching files does not contain a pair:", group, members, file=stderr)
+            continue
         out = op.basename(group)
         if not out.endswith(".gz"):
             out += ".gz"
@@ -45,7 +52,10 @@ def main(indirs, outdir, dryrun=True, jobs=1, force=False, gzip="gzip"):
         todo.append(cmd)
 
     if dryrun:
-        print(*todo, sep="\n")
+        if len(todo) > 0:
+            print(*todo, sep="\n")
+        else:
+            print("No groups found", file=stderr)
         return
     pool = mp.Pool(jobs)
     res = pool.imap(run, todo)
@@ -68,7 +78,7 @@ if __name__ == "__main__":
     a.add_argument("OUTPUT", type=str,
                    help="Output directory (created if non-existant)")
     a.add_argument("INPUT", nargs='+', type=str,
-                   help="Input directory(s)")
+                   help="Input directory(s) or files")
     args = a.parse_args()
     main(args.INPUT, args.OUTPUT, dryrun=args.dry_run, jobs=args.jobs,
          force=args.force, gzip=args.gzip)
