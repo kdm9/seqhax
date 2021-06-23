@@ -34,17 +34,20 @@ pairs_usage(FILE *stream)
     fprintf(stream, "    -y FILE    Output statistics to FILE.\n");
     fprintf(stream, "\n");
     fprintf(stream, "Output files are NOT compressed. To apply compression, please use\n");
-    fprintf(stream, "Subprocess streams, e.g.:\n");
+    fprintf(stream, "subprocess streams, for example:\n");
     fprintf(stream, "\n");
     fprintf(stream, "  seqhax pairs -1 >(gzip > read1.fq.gz) -2 >(gzip > read2.fq.gz) \\\n");
-    fprintf(stream, "      -u >(gzip > unapired.fq.gz) reads.fq.gz\n");
+    fprintf(stream, "      -u >(gzip > unpaired.fq.gz) reads.fq.gz\n");
     fprintf(stream, "\n");
     fprintf(stream, "One can of course use other compression algorithms, e.g zstd.\n");
     fprintf(stream, "\n");
     fprintf(stream, "FILE should be a sequence file in FASTA or FASTQ format.\n");
     fprintf(stream, "To accept reads from standard input, use '/dev/stdin' as\n");
-    fprintf(stream, "the input file. To output to standard output, use '-'.\n");
+    fprintf(stream, "the input file. To output to standard output, use '/dev/stdout'.\n");
+    fprintf(stream, "To discard some reads (e.g. unpaired reads), use '/dev/null' as\n");
+    fprintf(stream, "the filename (i.e. -u /dev/null to discard unpaired reads).'\n");
 }
+
 static const char *pairs_optstr = "fl:1:2:p:u:s:b:y:h";
 
 /*******************************************************************************
