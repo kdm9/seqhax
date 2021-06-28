@@ -61,7 +61,7 @@ stats_main(int argc, char *argv[])
     }
 
     atomic_size_t errorcount(0);
-    cout << "filename\treads\tacgtnbases\tacgtbases\tgcbases\tstatus" << endl;
+    cout << "filename\treads\tacgtnbases\tacgtbases\tgcbases\tqcmin\tqcmax\tstatus" << endl;
     #pragma omp parallel for num_threads(n_threads) schedule(dynamic) shared(errorcount)
     for (int file = optind; file < argc; file++) {
         size_t nbases = 0;
@@ -69,6 +69,8 @@ stats_main(int argc, char *argv[])
         size_t nnon = 0;
         size_t nlines = 0;
         size_t seqlen = 0;
+        int qcmin = INT_MAX;
+        int qcmax = INT_MIN;
         string status = "OK";
 
         igzstream fp;
@@ -103,6 +105,11 @@ stats_main(int argc, char *argv[])
                         break;
                     case 3:
                         if (line.size() != seqlen) throw runtime_error("Size of sequence (" + to_string(seqlen) + ") and quality (" + to_string(line.size()) +") doesn't match");
+                        for (size_t i = 0; i < line.size(); i++) {
+                            char c = line[i];
+                            qcmin = c < qcmin? c : qcmin;
+                            qcmax = c > qcmax? c : qcmax;
+                        }
                         break;
                 }
             }
@@ -115,9 +122,9 @@ stats_main(int argc, char *argv[])
 
         #pragma omp critical
         {
-            cout << argv[file] << '\t' << (nlines/4) << '\t' << nbases << '\t' << nnon << '\t' << ngc << '\t' << status << endl;
+            cout << argv[file] << '\t' << (nlines/4) << '\t' << nbases << '\t' << nnon << '\t' << ngc << '\t' << qcmin << '\t' << qcmax << '\t' << status << endl;
         }
     }
-    return errorcount == 0 ? 0 : 1;
+    return errorcount == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
