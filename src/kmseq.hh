@@ -28,6 +28,11 @@ struct KSeq
     string name;
     string seq;
     string qual;
+
+    string id() {
+        size_t firstsp = name.find_first_of(' ');
+        return name.substr(0, firstsp);
+    }
 };
 
 

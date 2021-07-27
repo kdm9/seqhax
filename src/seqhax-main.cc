@@ -38,6 +38,7 @@ int clihist_main(int argc, char *argv[]);
 int pecheck_main(int argc, char *argv[]);
 int rebarcode_main(int argc, char *argv[]);
 int stats_main(int argc, char *argv[]);
+int grepbed_main(int argc, char *argv[]);
 
 
 static const struct seqhax_prog program_mains[] = {
@@ -53,6 +54,7 @@ static const struct seqhax_prog program_mains[] = {
     {"rebarcode",       rebarcode_main},
     {"pecheck",         pecheck_main},
     {"clihist",         clihist_main},
+    {"grepbed",         grepbed_main},
     {NULL,              NULL}
 };
 
