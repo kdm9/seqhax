@@ -1,14 +1,17 @@
 SET(LIBQES_AS_SUBMODULE True)
-ADD_SUBDIRECTORY(ext/libqes)
+ADD_SUBDIRECTORY(lib/libqes)
 
-INCLUDE_DIRECTORIES(ext)
-INCLUDE_DIRECTORIES(ext/gzstream)
-SET(EXT_SOURCES  ext/gzstream/gzstream.C)
-
-file(GLOB CMD_SOURCES progs/*.c progs/*.cc)
+INCLUDE_DIRECTORIES(lib)
+INCLUDE_DIRECTORIES(lib/gzstream)
+SET(EXT_SOURCES  lib/gzstream/gzstream.C)
 
 
 # Targets
-ADD_EXECUTABLE(seqhax seqhax-main.cc ${CMD_SOURCES} ${EXT_SOURCES})
+file(GLOB CMD_SOURCES seqhax/progs/*.c seqhax/progs/*.cc)
+ADD_EXECUTABLE(seqhax seqhax/seqhax-main.cc ${CMD_SOURCES} ${EXT_SOURCES})
 TARGET_LINK_LIBRARIES(seqhax qes_static ${SEQHAX_LIB_DEPENDS})
 INSTALL(TARGETS seqhax DESTINATION "bin")
+
+ADD_EXECUTABLE(htshax htshax/main.cc htshax/htshax_bcfhist.cc ${EXT_SOURCES})
+TARGET_LINK_LIBRARIES(htshax qes_static ${SEQHAX_LIB_DEPENDS})
+INSTALL(TARGETS htshax DESTINATION "bin")

@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 PROJECT(seqhax C CXX)
 
 # Cmake options
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/libqes/cmake-modules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/cmake/")
 
 #############
 ## Options ##
@@ -49,23 +49,31 @@ MESSAGE(STATUS "${CMAKE_BUILD_TYPE} build of ${PROJECT_NAME} version: ${SHX_VERS
 
 # we find ZLIB here as well as in libqes as non-qes files (e.g. trimadap) don't
 # get zlib from libqes.
-FIND_PACKAGE(ZLIB 1.2.5 REQUIRED)
+find_package(PkgConfig REQUIRED)
+FIND_PACKAGE(ZLIB 1.2.8 REQUIRED)
+
+pkg_check_modules(HTSLIB REQUIRED htslib>=1.10)
 
 FIND_PACKAGE(OpenMP REQUIRED)
 #FIND_PACKAGE(Boost REQUIRED COMPONENTS program_options)
 SET(SEQHAX_DEPENDS_CFLAGS
     ${SEQHAX_DEPENDS_CFLAGS}
     ${ZLIB_CFLAGS}
-    ${OpenMP_C_FLAGS})
+    ${OpenMP_C_FLAGS}
+    ${HTSLIB_CFLAGS}
+    )
 SET(SEQHAX_LIB_DEPENDS
     ${SEQHAX_LIB_DEPENDS}
     ${ZLIB_LIBRARIES}
     ${Boost_LIBRARIES}
+    ${HTSLIB_LIBRARIES}
     )
 INCLUDE_DIRECTORIES(
     ${SEQHAX_DEPENDS_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIRS})
+    ${Boost_INCLUDE_DIRS}
+    ${HTSLIB_INCLUDE_DIRS}
+    )
 
 ##########################
 ## Set Compiler Options ##
