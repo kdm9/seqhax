@@ -77,7 +77,7 @@ sample sample into a single interleaved file, while checking read IDs match.
 
 ## `htshax`
 
-`htshax` consists of various utilities for the handling of HTS formats via HTSlib. These are mostly things that I wish samtools/bcftools would do, but aren't quite
+`htshax` consists of various utilities for the handling of HTS formats via HTSlib. These are mostly things that I wish samtools/bcftools would do, but don't.
 
 ```
 $ htshax
