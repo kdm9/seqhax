@@ -2,7 +2,7 @@ Seqhax
 ======
 
 A seqtk-style toolkit for sequence analysis. By no means feature complete. In
-fact largely contains features other authors have not merged into their
+fact largely contains features other authors have not implemented in their
 respective tools.
 
 Installation
