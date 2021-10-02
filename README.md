@@ -28,7 +28,7 @@ Documentation
 
 There are two commands in this package: `seqhax` and `htshax`. 
 
-## `SEQHAX`
+## `seqhax`
 
 The `seqhax` command contains various sequence file manipulation subcommands. The commands, along with a synopsis
 of their actions, are displayed when one types `seqhax` with no arguments. 
