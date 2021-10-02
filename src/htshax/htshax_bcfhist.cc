@@ -50,6 +50,8 @@ int bcfhist_main(int argc, char **argv) {
     bool success = true;
     map<int, uint64_t> af_hist;
     map<int, uint64_t> miss_hist;
+    map<int, uint64_t> qual_hist;
+    map<int, uint64_t> dp_hist;
 
     for (int i=0; i<=100; i++) {
         af_hist[i] = 0;
@@ -94,12 +96,32 @@ int bcfhist_main(int argc, char **argv) {
         }
         float miss = (float)nmiss / nentry;
         float af = (float)nalt / (nentry - nmiss);
+        bcf_info_t *dp_info = bcf_get_info(header, record, "DP");
+        float dp = -1;
+        if (dp_info != NULL) {
+            assert(dp_info->len == 1);
+            switch (dp_info->type) {
+                case BCF_BT_INT8:
+                case BCF_BT_INT16:
+                case BCF_BT_INT32:
+                case BCF_BT_INT64:
+                    dp = dp_info->v1.i;
+                    break;
+                case BCF_BT_FLOAT:
+                    dp = dp_info->v1.f;
+                    break;
+            }
+        }
+
+
         //cerr << bcf_hdr_id2name(header, record->rid) << "\t" << record->pos << "\t" << nmiss << "\t" << nalt << "\t" << nentry - nmiss << "\t" << af << "\t" << miss << endl;
 
         //af_hist(af);
         //mis_hist(miss);
         af_hist[percent(af)]++;
         miss_hist[percent(miss)]++;
+        qual_hist[(int)round(record->qual)]++;
+        dp_hist[(int)round(dp)]++;
     }
     if (sr->errnum) {
         cerr << "Error: " << bcf_sr_strerror(sr->errnum) << endl;
@@ -107,11 +129,17 @@ int bcfhist_main(int argc, char **argv) {
 
     if (success) {
         cout << "metric\tpercent\tnsnp" << endl;
-        for (int i=0; i<=100; i++) {
-            cout << "af\t" << i << "\t" << af_hist[i]  << endl;
+        for (const auto &[key, value]: af_hist) {
+            cout << "af\t" << key << "\t" << value  << endl;
         }
-        for (int i=0; i<=100; i++) {
-            cout << "miss\t" << i << "\t" << miss_hist[i]  << endl;
+        for (const auto &[key, value]: miss_hist) {
+            cout << "miss\t" << key << "\t" << value  << endl;
+        }
+        for (const auto &[key, value]: qual_hist) {
+            cout << "qual\t" << key << "\t" << value  << endl;
+        }
+        for (const auto &[key, value]: dp_hist) {
+            cout << "dp\t" << key << "\t" << value  << endl;
         }
     }
 
