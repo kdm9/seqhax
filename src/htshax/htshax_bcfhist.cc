@@ -1,7 +1,4 @@
-//#include <boost/histogram.hpp>
 #include <iostream>
-
-//using namespace boost::histogram;
 
 #include <map>
 #include <cmath>

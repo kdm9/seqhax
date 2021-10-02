@@ -15,20 +15,19 @@ int bcfhist_main(int argc, char *argv[]);
 
 
 static const struct prog programs[] = {
-    {"bcfhist",     bcfhist_main,       "Calculate histograms on MAF allele freq and missingness across samples"},
+    {"bcfhist",     bcfhist_main,       "Calculate histograms on allele freq, missingness, qual, and depth across all variants."},
     {NULL,          NULL,               NULL}
 };
 
 void
 htshax_usage()
 {
-    cerr << "Usage" << endl
+    cerr << "USAGE:" << endl
          << "    htshax PROGRAM [options]" << endl
          << endl
-         << "where PROGRAM is one of:" << endl
-         << endl;;
+         << "where PROGRAM is one of:" << endl;;
     for (const struct prog *program = programs; program->name; program++) {
-        cerr << program->name <<  " -- " << program->desc << endl;
+        cerr << "    " << program->name <<  " -- " << program->desc << endl;
     }
 }
 
