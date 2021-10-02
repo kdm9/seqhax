@@ -26,7 +26,11 @@ Any other issues, file a [bug report on github](https://github.com/kdmurray91/se
 Documentation
 =============
 
-The `seqhax` command has many subcommands. The commands, along with a synopsis
+There are two commands in this package: `seqhax` and `htshax`. 
+
+## `SEQHAX`
+
+The `seqhax` command contains various sequence file manipulation subcommands. The commands, along with a synopsis
 of their actions, are displayed when one types `seqhax` with no arguments. 
 At the time of writing, these were:
 
@@ -48,29 +52,9 @@ where PROGRAM is one of:
 ```
 
 The usage of each subcommand can be obtained using the `-h` flag to that
-subcommand, e.g. `seqhax preapp -h`.
+subcommand, e.g. `seqhax preapp -h`. 
 
-
-## Sub-commands
-
-
-#### `anon`
-
-Re-name sequences with a sequential numeric ID.
-
-
-#### `convert`
-
-Convert between FASTA and FASTQ formats.
-
-
-#### `filter`
-
-Removes sequences based on certain criteria:
-
-- Length
-* Pairing
-
+Some brief description of the more involved commands is below.
 
 #### `pairs`
 
@@ -80,7 +64,7 @@ forms:
 - Separate R1/R2 paired files and single read read file.
 - "Strict" interleaved file, where failed/missing reads are replaced with a
   single 'N'.
-* "Broken paired" interleaved files, where failed/missing reads are simply not
+- "Broken paired" interleaved files, where failed/missing reads are simply not
   present.
 
 #### `pecheck`
@@ -89,26 +73,13 @@ Checks that read pairs are correctly matched, between split (R1 & R2) files, or
 interleaved files. Optionally, can be used to join multiple R1/R2 from the
 sample sample into a single interleaved file, while checking read IDs match.
 
-#### `preapp`
+## `htshax`
 
-Addition of a constant prefix and/or suffix to each sequence.
+`htshax` consists of various utilities for the handling of HTS formats via HTSlib. These are mostly things that I wish samtools/bcftools would do, but aren't quite 
 
+#### `bcfhist`
 
-#### `randseq`
-
-Generates a fasta or fastq file containing sequences with random sequences.
-
-
-#### `stats`
-
-Counts number of reads and basepairs in sequence files, and outputs a
-convenient table.
-
-
-#### `trunc`
-
-Truncates reads at given length.
-
+Create histograms over various V/BCF metrics used in variant filtering (`QUAL`, `ALLELE_FREQ`, `F_MISSING`, `INFO/DP`). Nominally bcftools stats could do this, but it doesn't summarise missingness, so I wrote this quick tool to do so.
 
 # License
 
