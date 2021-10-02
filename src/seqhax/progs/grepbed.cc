@@ -24,15 +24,11 @@ int grepbed_main(int argc, char *argv[])
 {
     std::string pattern;
     std::string filename;
-    int n_threads = 1;
     int ret = EXIT_SUCCESS;
 
     int c;
-    while ((c = getopt(argc, argv, "t:p:h")) > 0) {
+    while ((c = getopt(argc, argv, "p:h")) > 0) {
         switch (c) {
-            case 't':
-                n_threads = atoi(optarg);
-                break;
             case 'p':
                 pattern = optarg;
                 break;
