@@ -42,11 +42,13 @@ USAGE:
 where PROGRAM is one of:
     anon       -- Rename sequences by a sequential number
     convert    -- Convert between FASTA and FASTQ formats
+    clihist    -- Records a histogram of stdin.
     filter     -- Filter reads from a sequence file
     pairs      -- (De)interleave paired end reads
-    pecheck    -- Check that paired end reads match properly (also join them)
+    pecheck    -- Check that paired end reads match properly
     preapp     -- Prepend or append string to sequences
     randseq    -- Generate a random sequence file
+    rebarcode  -- Add index sequences from header to the start of reads
     stats      -- Basic statistics about sequence files
     trunc      -- Truncate sequences
 ```
@@ -75,7 +77,17 @@ sample sample into a single interleaved file, while checking read IDs match.
 
 ## `htshax`
 
-`htshax` consists of various utilities for the handling of HTS formats via HTSlib. These are mostly things that I wish samtools/bcftools would do, but aren't quite 
+`htshax` consists of various utilities for the handling of HTS formats via HTSlib. These are mostly things that I wish samtools/bcftools would do, but aren't quite
+
+```
+$ htshax
+Usage
+    htshax PROGRAM [options]
+
+where PROGRAM is one of:
+
+bcfhist -- Calculate histograms on MAF allele freq and missingness across samples
+```
 
 #### `bcfhist`
 
