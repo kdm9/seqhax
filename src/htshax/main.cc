@@ -25,7 +25,8 @@ htshax_usage()
     cerr << "Usage" << endl
          << "    htshax PROGRAM [options]" << endl
          << endl
-         << "where PROGRAM is one of:" << endl;
+         << "where PROGRAM is one of:" << endl
+         << endl;;
     for (const struct prog *program = programs; program->name; program++) {
         cerr << program->name <<  " -- " << program->desc << endl;
     }
