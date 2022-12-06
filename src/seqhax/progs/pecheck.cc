@@ -22,7 +22,7 @@ struct PECheckOptions {
     bool interleaved;
 };
 
-inline void helpmsg(void)
+static inline void pecheck_helpmsg(void)
 {
     cerr << "USAGE:" << endl
          << "    seqhax pecheck [OPTIONS] r1fq r2fq [r1fq r2fq ...]" << endl
@@ -37,7 +37,7 @@ inline void helpmsg(void)
          << "    -t THREADS     Number of parallel threads (default: no output)"<< endl;
 }
 
-int parse_args(PECheckOptions &opt, int argc, char *argv[])
+int pecheck_parse_args(PECheckOptions &opt, int argc, char *argv[])
 {
 
     int c;
@@ -66,7 +66,7 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
             case '?':
                 ret = EXIT_FAILURE;
             case 'h':
-                helpmsg();
+                pecheck_helpmsg();
                 return ret;
         }
     }
@@ -74,7 +74,7 @@ int parse_args(PECheckOptions &opt, int argc, char *argv[])
     const int remaining = argc - optind;
     if (    (opt.interleaved && remaining < 1) ||
             (!opt.interleaved && (remaining < 2 || remaining % 2 != 0))) {
-        helpmsg();
+        pecheck_helpmsg();
         return EXIT_FAILURE;
     }
 
@@ -96,7 +96,7 @@ int pecheck_main(int argc, char *argv[])
     PECheckOptions opt;
     ofstream output;
 
-    if (parse_args(opt, argc, argv) != 0) {
+    if (pecheck_parse_args(opt, argc, argv) != 0) {
         return 1;
     }
 
