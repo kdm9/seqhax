@@ -10,7 +10,7 @@ using namespace std;
 using namespace kmseq;
 
 
-inline void helpmsg(void)
+inline void grepbed_helpmsg(void)
 {
     cerr << "USAGE:" << endl;
     cerr << "    seqhax grepbed -p REGEX FASTA_FILE" << endl
@@ -35,12 +35,12 @@ int grepbed_main(int argc, char *argv[])
             case '?':
                 ret = EXIT_FAILURE;
             case 'h':
-                helpmsg();
+                grepbed_helpmsg();
                 return ret;
         }
     }
     if (optind >= argc) {
-        helpmsg();
+        grepbed_helpmsg();
         return EXIT_FAILURE;
     }
 
