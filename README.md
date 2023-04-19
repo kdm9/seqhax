@@ -97,4 +97,4 @@ Create histograms over various V/BCF metrics used in variant filtering (`QUAL`, 
 
 GPL v3 (see ./LICENSE).
 
-Copyright (c) 2014-2016 Kevin Murray.
+Copyright (c) 2014-2023 Kevin Murray.
