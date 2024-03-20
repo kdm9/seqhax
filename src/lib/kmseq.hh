@@ -14,6 +14,7 @@
 #include <ostream>
 #include <vector>
 #include <stdexcept>
+#include <cstdint>
 #include "kseq.h"
 
 namespace kmseq

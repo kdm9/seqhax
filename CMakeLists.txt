@@ -9,11 +9,14 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/cmake/")
 #############
 
 option(STATIC_BUILD "Build a static binary" OFF)
+option(HTSHAX "Build htshax" ON)
 
 if (STATIC_BUILD)
     message(STATUS "Building static ${PROJECT_NAME} binaries")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static ")
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+    #message(WARNING "htshax is disabled for static builds")
+    #set(HTSHAX off)
 endif()
 
 ###########
@@ -52,7 +55,9 @@ MESSAGE(STATUS "${CMAKE_BUILD_TYPE} build of ${PROJECT_NAME} version: ${SHX_VERS
 find_package(PkgConfig REQUIRED)
 FIND_PACKAGE(ZLIB 1.2.8 REQUIRED)
 
+if (HTSHAX)
 pkg_check_modules(HTSLIB REQUIRED htslib>=1.10)
+endif()
 
 FIND_PACKAGE(OpenMP REQUIRED)
 #FIND_PACKAGE(Boost REQUIRED COMPONENTS program_options)
